@@ -1,0 +1,18 @@
+.myIconButton {
+    background: transparent;
+    color: #000;
+    border-radius: 12px;
+    width: 100%;
+    padding: 18px 20px;
+    border: 1px solid #c7c7c7;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.1s ease;
+    &:hover {
+        border: 1px solid #b9b9b9;
+    };
+    &:active {
+        transform: scale(0.97);
+    }
+}
