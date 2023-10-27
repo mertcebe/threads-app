@@ -27,7 +27,7 @@ const AppRouter = () => {
 
           {/* Public Route */}
           <Route element={<PublicRoute isAuthorized={isAuthorized} />}>
-            <Route path='/sign-in' element={<SignInPage />} />
+            <Route path='/login' element={<SignInPage />} />
           </Route>
         </Routes>
         <ToastContainer

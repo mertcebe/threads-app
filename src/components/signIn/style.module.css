@@ -3,16 +3,39 @@
     color: #000;
     border-radius: 12px;
     width: 100%;
-    padding: 18px 20px;
+    padding: 20px;
     border: 1px solid #c7c7c7;
     display: flex;
     justify-content: space-between;
     align-items: center;
     transition: all 0.1s ease;
+
     &:hover {
         border: 1px solid #b9b9b9;
-    };
+    }
+
+    ;
+
     &:active {
         transform: scale(0.97);
+    }
+}
+
+.imageContainer {
+    width: 115%;
+    transform: translateX(-100px);
+    position: fixed;
+    top: 0;
+    z-index: -1;
+}
+
+.links:hover {
+    text-decoration: underline !important;
+}
+
+@media (max-width: 960px) {
+    .imageContainer {
+        width: 1400px;
+        transform: translateX(-20%);
     }
 }
