@@ -1,0 +1,6 @@
+.leftBarContainer{
+    height: calc(100vh - 50px);
+    position: sticky;
+    bottom: 50px;
+    width: 340px;
+}

@@ -4,10 +4,11 @@ import { auth } from '../../firebase/firebaseConfig'
 
 const Home = () => {
   return (
-    <div>
+    <div style={{width: "calc(100% - 534.28px)"}}>
       <button onClick={() => {
         signOut(auth);
       }}>sign out</button>
+      home page
     </div>
   )
 }

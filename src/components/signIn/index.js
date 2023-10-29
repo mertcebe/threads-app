@@ -103,6 +103,9 @@ const SignInPage = () => {
             else {
                 createUserWithEmailAndPassword(auth, email, password)
                     .then((userCredentials) => {
+                        updateProfile(userCredentials.user, {
+                            displayName: name
+                        })
                         toast.dark(userCredentials.user.displayName, 'welcome');
                         setDoc(doc(database, `users/${userCredentials.user.uid}`), {
                             displayName: name,
