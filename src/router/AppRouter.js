@@ -21,7 +21,7 @@ const AppRouter = () => {
     )
   }
   return (
-    <div>
+    <div style={{ background: isAuthorized ? "#000" : "" }}>
       <BrowserRouter>
         {
           isAuthorized &&
@@ -30,9 +30,7 @@ const AppRouter = () => {
         <div style={{ display: "flex", alignItems: "start" }}>
           {
             isAuthorized &&
-            <div style={{ position: "relative" }}>
-              <LeftBar />
-            </div>
+            <LeftBar />
           }
           <Routes>
             {/* Private Route */}

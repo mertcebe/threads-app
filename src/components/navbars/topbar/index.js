@@ -13,18 +13,13 @@ const TopBar = ({ type }) => {
                 setUser(snapshot.data());
             })
     })
-    if (!user) {
-        return (
-            <></>
-        )
-    }
     return (
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "#252525", height: "50px", position: "sticky", top: "0", padding: "0 30px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "#161616", height: "50px", position: "sticky", top: "0", padding: "0 30px" }}>
             <NavLink to={'/'} style={{ display: "flex", alignItems: "center", textDecoration: "none", color: "#e3e3e3" }}>
                 <img src={logoColorful} alt="" style={{ width: "25px", height: "25px", marginRight: "8px", pointerEvents: "none" }} />
                 <h5 className='m-0 p-0'>Threads</h5>
             </NavLink>
-            <NavLink to={'/profile'} style={{ display: "flex", alignItems: "center", textDecoration: "none", color: "#e3e3e3" }}><AccountCircleIcon sx={{ marginRight: "5px" }} />{user.displayName}</NavLink>
+            <NavLink to={'/profile'} style={{ display: "flex", alignItems: "center", textDecoration: "none", color: "#e3e3e3" }}><AccountCircleIcon sx={{ marginRight: "5px" }} />{user?user.displayName:'user'}</NavLink>
         </div>
     )
 }

@@ -4,7 +4,7 @@ import styled from "@emotion/styled";
 import style from './style.module.css';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithRedirect, updateProfile } from 'firebase/auth';
+import { GoogleAuthProvider, createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithRedirect, updateProfile } from 'firebase/auth';
 import database, { auth } from '../../firebase/firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
 
@@ -49,6 +49,7 @@ const SignInPage = () => {
     let [email, setEmail] = useState('');
     let [password, setPassword] = useState('');
     let navigate = useNavigate();
+    const searchParams = useSearchParams()[0].get('sign');
     const signInFunc = () => {
         const emailInput = document.getElementById('emailInput')
         const passwordInput = document.getElementById('passwordInput')
@@ -123,19 +124,26 @@ const SignInPage = () => {
         }
     }
 
+    const resetPasswordFunc = () => {
+        sendPasswordResetEmail(auth, email)
+            .then(() => {
+                toast.dark(`Send reset password to ${email}`);
+            })
+            .catch((err) => {
+                const errorCode = err.code;
+                const message = errorCode.replace('/', ' error: ').split('-').join(' ');
+                toast.dark(message);
+            })
+    }
+
     return (
-        <div className='m-0 p-0' style={{ width: "100%", overflow: "hidden" }}>
+        <div style={{ width: "100%", overflow: "hidden" }}>
             <img className={style.imageContainer} src="https://static.cdninstagram.com/rsrc.php/yb/r/iv-ercy-2_j.webp" alt="" />
             <div className='d-flex justify-content-center align-items-end w-100' style={{ height: "90vh" }}>
                 <div style={{ padding: "10px", width: "400px", textAlign: "center" }}>
+                    <small className='d-block mb-3' style={{ fontSize: "16px", textAlign: "center" }}><b>{searchParams !== 'up' ? searchParams === 'reset-password' ? 'Reset your password' : 'Sign in with Instagram account' : 'Sign up'}</b></small>
                     {
-                        useSearchParams()[0].get('sign') !== 'up' ?
-                            <small className='d-block mb-3' style={{ fontSize: "16px", textAlign: "center" }}><b>Sign in with Instagram account</b></small>
-                            :
-                            <small className='d-block mb-3' style={{ fontSize: "20px", textAlign: "center" }}><b>Sign up</b></small>
-                    }
-                    {
-                        useSearchParams()[0].get('sign') === 'up' ?
+                        searchParams === 'up' ?
                             <WhiteBorderTextField id='nameInput' variant='outlined' InputProps={{ style: { borderRadius: "12px", background: "transparent", backdropFilter: "blur(4px)", fontWeight: "bold" } }} style={{ display: "block", marginBottom: "10px", borderColor: "red" }} fullWidth onChange={(e) => {
                                 setName(e.target.value);
                             }} placeholder='Name' />
@@ -145,22 +153,35 @@ const SignInPage = () => {
                     <WhiteBorderTextField id='emailInput' variant='outlined' InputProps={{ style: { borderRadius: "12px", background: "transparent", backdropFilter: "blur(4px)", fontWeight: "bold" } }} style={{ display: "block", marginBottom: "10px", borderColor: "red" }} fullWidth onChange={(e) => {
                         setEmail(e.target.value);
                     }} placeholder='User name, number or email' />
-                    <WhiteBorderTextField id='passwordInput' variant='outlined' type='password' InputProps={{ style: { borderRadius: "12px", background: "transparent", backdropFilter: "blur(4px)", fontWeight: "bold" } }} style={{ display: "block", marginBottom: "10px" }} fullWidth onChange={(e) => {
-                        setPassword(e.target.value);
-                    }} placeholder='Password' />
                     {
-                        useSearchParams()[0].get('sign') === 'up' ?
+                        searchParams === 'reset-password' ?
+                            <></>
+                            :
+                            <WhiteBorderTextField id='passwordInput' variant='outlined' type='password' InputProps={{ style: { borderRadius: "12px", background: "transparent", backdropFilter: "blur(4px)", fontWeight: "bold" } }} style={{ display: "block", marginBottom: "10px" }} fullWidth onChange={(e) => {
+                                setPassword(e.target.value);
+                            }} placeholder='Password' />
+                    }
+                    {
+                        searchParams === 'up' ?
                             <MyButton style={{ cursor: email && password && name ? "pointer" : "not-allowed", color: email && password && name ? '#fff' : 'grey' }} onClick={signUpFunc}>Sign up</MyButton>
                             :
-                            <MyButton style={{ cursor: email && password ? "pointer" : "not-allowed", color: email && password ? '#fff' : 'grey' }} onClick={signInFunc}>Sign in</MyButton>
+                            searchParams === 'reset-password' ?
+                                <MyButton style={{ cursor: email ? "pointer" : "not-allowed", color: email ? '#fff' : 'grey' }} onClick={resetPasswordFunc}>Reset</MyButton>
+                                :
+                                <MyButton style={{ cursor: email && password ? "pointer" : "not-allowed", color: email && password ? '#fff' : 'grey' }} onClick={signInFunc}>Sign in</MyButton>
                     }
-                    <Link to={'/reset-password'} style={{ color: "grey", textDecoration: "none", fontSize: "14px", display: "inline-block", margin: "12px 0" }}>Forgot password?</Link>
+                    {
+                        searchParams === 'reset-password' ?
+                            <div><small className='text-muted'>Did you remember your password?</small> <Link to={'/login?sign=in'} style={{ color: "grey", textDecoration: "none", fontSize: "14px", display: "inline-block", margin: "12px 0" }}>Sign in</Link></div>
+                            :
+                            <Link to={'/login?sign=reset-password'} style={{ color: "grey", textDecoration: "none", fontSize: "14px", display: "inline-block", margin: "12px 0" }}>Forgot password?</Link>
+                    }
                     <div style={{ position: "relative", width: "100%", height: "30px", margin: "12px 0" }}>
                         <hr />
                         <span style={{ position: "absolute", top: "-12.5px", left: "50%", transform: "translateX(-50%)", background: "#fff", display: "inline-block", padding: "0 10px", color: "#9f9f9f" }}>or</span>
                     </div>
                     <MyButtonWithIcon icon={<i className="fa-brands fa-instagram"></i>}>Continue with Instagram</MyButtonWithIcon>
-                    <div style={{ textAlign: "left", margin: "10px 0" }}><small style={{ color: "grey" }}>{useSearchParams()[0].get('sign') !== 'up' ? 'No account?' : 'Already have an account?'}</small> <Link to={useSearchParams()[0].get('sign') === 'up' ? '/login?sign=in' : '/login?sign=up'} style={{ textDecoration: "none", fontSize: "14px" }}>Sign {useSearchParams()[0].get('sign') === 'up' ? 'in' : 'up'}</Link></div>
+                    <div style={{ textAlign: "left", margin: "10px 0" }}><small style={{ color: "grey" }}>{searchParams !== 'up' ? 'No account?' : 'Already have an account?'}</small> <Link to={searchParams === 'up' ? '/login?sign=in' : '/login?sign=up'} style={{ textDecoration: "none", fontSize: "14px" }}>Sign {searchParams === 'up' ? 'in' : 'up'}</Link></div>
                 </div>
 
                 <div style={{ position: 'absolute', bottom: "10px", left: "50%", transform: "translateX(-50%)", display: "flex", justifyContent: "space-between", alignItems: "center", width: "400px", padding: "0 10px" }}>
