@@ -12,6 +12,7 @@ import LeftBar from '../components/navbars/leftbar'
 import TopBar from '../components/navbars/topbar'
 import RightBar from '../components/navbars/rightbar'
 import CreatePage from '../components/create'
+import SinglePostPage from '../components/posts/singlePost'
 
 const AppRouter = () => {
   let { isAuthorized, loading } = useAuthorized();
@@ -36,6 +37,7 @@ const AppRouter = () => {
             {/* Private Route */}
             <Route element={<PrivateRoute isAuthorized={isAuthorized} />}>
               <Route path='/' element={<Home />} />
+              <Route path='/post' element={<SinglePostPage />} />
               <Route path='/create' element={<CreatePage />} />
             </Route>
 

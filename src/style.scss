@@ -1,2 +1,9 @@
 @import '../node_modules/bootstrap/scss/bootstrap.scss';
 
+.css-y4cjyz-MuiTouchRipple-ripple .MuiTouchRipple-child{
+    background-color: #b075e6 !important;
+}
+
+.css-y4cjyz-MuiTouchRipple-ripple.MuiTouchRipple-rippleVisible{
+    animation-duration: 200ms !important;
+}

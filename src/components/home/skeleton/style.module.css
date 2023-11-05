@@ -1,0 +1,37 @@
+.skeletonContainer {
+    transition: all 0.2s ease;
+    padding: 14px;
+    position: relative;
+    background-color: #161616;
+    border-radius: 10px;
+    margin: 30px 0;
+}
+
+.skeleton {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.skeleton::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg,
+            rgba(0, 0, 0, 0) 0,
+            #828282 25%,
+            rgba(0, 0, 0, 0.25) 50%,
+            rgba(0, 0, 0, 0));
+    animation: shimmer 1.2s infinite;
+    content: "";
+}
+
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
