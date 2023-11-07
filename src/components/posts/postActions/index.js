@@ -1,4 +1,4 @@
-import { addDoc, collection, doc, getDoc, getDocs, orderBy, query, setDoc } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, setDoc } from "firebase/firestore";
 import database from "../../../firebase/firebaseConfig";
 
 export const getAllPosts = () => {
@@ -31,13 +31,14 @@ export const getSinglePost = (id) => {
 
 export const getCommentsFrom = (id) => {
     return new Promise((resolve) => {
-        getDocs(query(collection(database, `allPosts/${id}/comments`), orderBy('dateSended', 'desc')))
+        getDocs(query(collection(database, `allPosts/${id}/comments`), orderBy('dateSended', 'asc')))
             .then((snapshot) => {
                 let comments = [];
                 snapshot.forEach((comment) => {
                     comments.push({
                         ...comment.data(),
-                        id: comment.id
+                        id: comment.id,
+                        postId: id
                     });
                 })
                 resolve(comments);
@@ -45,9 +46,16 @@ export const getCommentsFrom = (id) => {
     })
 }
 
-export const sendCommentTo = (postId, uid, comment) => {
-    addDoc(collection(database, `users/${uid}/posts/${postId}/comments`), comment)
+export const sendCommentTo = async (postId, uid, comment) => {
+    await addDoc(collection(database, `users/${uid}/posts/${postId}/comments`), {...comment, ownerUid: uid})
     .then((snapshot) => {
-        setDoc(doc(database, `allPosts/${postId}/comments/${snapshot.id}`), comment);
+        setDoc(doc(database, `allPosts/${postId}/comments/${snapshot.id}`), {...comment, ownerUid: uid});
+    })
+}
+
+export const deleteCommentOf = async (postId, ownerUid, commentId) => {
+    await deleteDoc(doc(database, `users/${ownerUid}/posts/${postId}/comments/${commentId}`))
+    .then(() => {
+        deleteDoc(doc(database, `allPosts/${postId}/comments/${commentId}`));
     })
 }

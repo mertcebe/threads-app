@@ -69,7 +69,7 @@ const SignInPage = () => {
         else {
             signInWithEmailAndPassword(auth, email, password)
                 .then((userCredentials) => {
-                    toast.dark(userCredentials.user.displayName, 'welcome back');
+                    toast.dark(`${userCredentials.user.displayName} welcome back`);
                     navigate('/');
                 })
                 .catch((err) => {

@@ -1,17 +1,27 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import logoColorful from '../../../images/threads-logo-with-different-colors.png';
+import profileImg from '../../../images/twitterProfileImg.png';
 import { IconButton } from '@mui/material';
 import style from './style.module.css'
 import { toast } from 'react-toastify';
 import { auth } from '../../../firebase/firebaseConfig';
 import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
+import { getCommentsFrom } from '../postActions';
 
 const Post = ({ post }) => {
   let [posts, setPosts] = useState();
   let [isLike, setIsLike] = useState();
+  let [comments, setComments] = useState();
+  const searchParams = useSearchParams()[0].get('id');
 
   let navigate = useNavigate();
+  useEffect(() => {
+    getCommentsFrom(post.id)
+      .then((comments) => {
+        setComments(comments);
+      })
+  }, []);
 
   const openCommentSec = () => {
     navigate(`/post?id=${post.id}`);
@@ -24,8 +34,10 @@ const Post = ({ post }) => {
       </div>
       <span style={{ width: "2px", height: "50%", position: "absolute", top: "30px", left: "33px", background: "#4a4a4a", zIndex: 1 }}></span>
       <div style={{ marginLeft: "10px" }}>
-        <p className='m-0 p-0 text-light'><b>{post.owner.displayName}</b></p>
-        <small style={{ color: "#dfdfdf" }}>{post.text}</small>
+        <div style={{ marginLeft: "8px" }}>
+          <p className='m-0 p-0 text-light'><b>{post.owner.displayName}</b></p>
+          <small style={{ color: "#dfdfdf" }}>{post.text}</small>
+        </div>
         <ul className={`${style.ulEl}`}>
           <li>
             <input type="checkbox" id={`chForLike${post.id}`} checked={isLike} style={{ display: "none" }} />
@@ -51,6 +63,27 @@ const Post = ({ post }) => {
             </IconButton>
           </li>
         </ul>
+        {
+          comments?.length !== 0 &&
+          <div style={{position: "relative", height: "30px", zIndex: 100}}>
+            <div style={{ position: "absolute", display: "flex", alignItems: "center", top: "0", left: "-40px" }}>
+              <div style={{position: "relative", width: "34px", height: "20px"}}>
+                {
+                  comments?.slice(0, 2).map((comment, index) => {
+                    return (
+                      <img src={comment.sender.photoURL?comment.sender.photoURL:profileImg} alt="" style={{width: "20px", height: "20px", borderRadius: "50%", transform: `translateX(${index * 10}px)`, position: "absolute"}} />
+                    )
+                  })
+                }
+              </div>
+              <small className='text-light' style={{opacity: "0.3", fontSize: "14px", cursor: searchParams === post.id?"context-menu":"pointer"}} onClick={() => {
+                if(searchParams !== post.id){
+                  navigate(`/post?id=${post.id}`);
+                }
+              }}>{comments?.length} {comments?.length === 1?'reply':'replies'}</small>
+            </div>
+          </div>
+        }
       </div>
     </div>
   )
