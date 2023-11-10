@@ -1,16 +1,20 @@
 let initialState = {
-    isCommentSecOpen: false,
-    commentOwner: null
+    refreshComments: false,
+    commentInComment: null
 };
 
 const CommentReducer = (state = initialState, action) => {
     switch (action.type) {
-        case 'TOGGLE_COMMENT_SEC':
+        case 'REFRESH_COMMENTS':
             return {
                 ...state,
-                isCommentSecOpen: action.payload.toggle,
-                commentOwner: action.payload.owner
+                refreshComments: action.payload,
             };
+        case 'START_COMMENT_IN_COMMENT':
+            return {
+                ...state,
+                commentInComment: action.payload
+            }
         default:
             return state
     }

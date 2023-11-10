@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import logoColorful from '../../../images/threads-logo-with-different-colors.png';
 import profileImg from '../../../images/twitterProfileImg.png';
 import { IconButton } from '@mui/material';
@@ -6,7 +7,7 @@ import style from './style.module.css'
 import { toast } from 'react-toastify';
 import { auth } from '../../../firebase/firebaseConfig';
 import { useNavigate } from 'react-router';
-import { useSearchParams } from 'react-router-dom';
+import { NavLink, useSearchParams } from 'react-router-dom';
 import { getCommentsFrom } from '../postActions';
 
 const Post = ({ post }) => {
@@ -16,12 +17,17 @@ const Post = ({ post }) => {
   const searchParams = useSearchParams()[0].get('id');
 
   let navigate = useNavigate();
+
+  let isRefreshComments = useSelector((state) => {
+    return state.commentReducer.refreshComments;
+  })
+
   useEffect(() => {
     getCommentsFrom(post.id)
       .then((comments) => {
         setComments(comments);
       })
-  }, []);
+  }, [isRefreshComments]);
 
   const openCommentSec = () => {
     navigate(`/post?id=${post.id}`);
@@ -65,22 +71,24 @@ const Post = ({ post }) => {
         </ul>
         {
           comments?.length !== 0 &&
-          <div style={{position: "relative", height: "30px", zIndex: 100}}>
+          <div style={{ position: "relative", height: "30px", zIndex: 100 }}>
             <div style={{ position: "absolute", display: "flex", alignItems: "center", top: "0", left: "-40px" }}>
-              <div style={{position: "relative", width: "34px", height: "20px"}}>
+              <div style={{ position: "relative", width: "34px", height: "20px" }}>
                 {
                   comments?.slice(0, 2).map((comment, index) => {
                     return (
-                      <img src={comment.sender.photoURL?comment.sender.photoURL:profileImg} alt="" style={{width: "20px", height: "20px", borderRadius: "50%", transform: `translateX(${index * 10}px)`, position: "absolute"}} />
+                      <NavLink to={auth.currentUser.uid === comment.sender.uid?`/profile`:`/profile/${comment.sender.uid}`}>
+                        <img src={comment.sender.photoURL ? comment.sender.photoURL : profileImg} alt="" style={{ width: "20px", height: "20px", borderRadius: "50%", transform: `translateX(${index * 10}px)`, position: "absolute" }} />
+                      </NavLink>
                     )
                   })
                 }
               </div>
-              <small className='text-light' style={{opacity: "0.3", fontSize: "14px", cursor: searchParams === post.id?"context-menu":"pointer"}} onClick={() => {
-                if(searchParams !== post.id){
+              <small className='text-light' style={{ opacity: "0.3", fontSize: "14px", cursor: searchParams === post.id ? "context-menu" : "pointer" }} onClick={() => {
+                if (searchParams !== post.id) {
                   navigate(`/post?id=${post.id}`);
                 }
-              }}>{comments?.length} {comments?.length === 1?'reply':'replies'}</small>
+              }}>{comments?.length} {comments?.length === 1 ? 'reply' : 'replies'}</small>
             </div>
           </div>
         }

@@ -21,6 +21,7 @@ const Home = () => {
   return (
     <div style={{ width: "calc(100% - 534.28px)", padding: "40px 30px" }}>
       <h4 style={{ color: "#fff" }}><b>Home</b></h4>
+      <button onClick={() => {signOut(auth)}}>sign out</button>
 
       <div>
         {

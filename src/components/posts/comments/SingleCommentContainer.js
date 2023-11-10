@@ -1,28 +1,59 @@
 import { IconButton } from '@mui/material';
 import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import logoColorful from '../../../images/twitterProfileImg.png';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { auth } from '../../../firebase/firebaseConfig';
-import { deleteCommentOf } from '../postActions';
+import { deleteCommentInOf, deleteCommentOf, getCommentsInFrom } from '../postActions';
 import { toast } from 'react-toastify';
+import { refreshAllComments, startCommentInCommentFunc } from '../../../reducers/commentReducer/CommentsActions';
 
 const SingleCommentContainer = ({ comment }) => {
     let [isLike, setIsLike] = useState();
     let [isDeleted, setIsDeleted] = useState(false);
-    const openCommentSec = () => {
 
+    const searchParams = useSearchParams()[0].get('id');
+    const searchParams2 = useSearchParams()[0].get('commentTo');
+
+    let navigate = useNavigate();
+
+    const openCommentSec = () => {
+        navigate(`/post?id=${searchParams}&commentTo=${comment.sender.uid}`)
+        getCommentsInFrom(searchParams, comment.id)
+            .then((snapshot) => {
+                startCommentInCommentFunc(dispatch, {
+                    comments: snapshot,
+                    commentIn: comment
+                });
+            })
     }
 
+    let [isRefreshComments, startCommentInComment] = useSelector((state) => {
+        return [state.commentReducer.refreshComments, state.commentReducer.commentInComment];
+    });
+    let dispatch = useDispatch();
+
     const deleteComment = () => {
-        deleteCommentOf(`${comment.postId}`, `${comment.ownerUid}`, `${comment.id}`)
-        .then(() => {
-            setIsDeleted(true);
-        })
+        if (!searchParams2) {
+            deleteCommentOf(`${comment.postId}`, `${comment.ownerUid}`, `${comment.id}`)
+                .then(() => {
+                    setIsDeleted(true);
+                    refreshAllComments(dispatch, !isRefreshComments);
+                })
+        }
+        else {
+            console.log(startCommentInComment)
+            deleteCommentInOf(comment.postId, comment.sender.uid, startCommentInComment?.commentIn.id, comment.id)
+                .then(() => {
+                    setIsDeleted(true);
+                    refreshAllComments(dispatch, !isRefreshComments);
+                })
+        }
     }
 
     return (
-        <div style={{ display: "flex", alignItems: "start", margin: "0", padding: "10px 14px", borderRadius: "10px", position: "relative", opacity: isDeleted?'0.4':'1', pointerEvents: isDeleted&&'none' }}>
+        <div style={{ display: "flex", alignItems: "start", margin: "0", padding: "10px 14px", borderRadius: "10px", position: "relative", opacity: isDeleted ? '0.4' : '1', pointerEvents: isDeleted && 'none' }}>
             <div>
                 <img src={comment.sender.photoURL ? comment.sender.photoURL : logoColorful} alt="" style={{ width: "36px", height: "36px", borderRadius: "50%", position: "relative", zIndex: 20 }} />
             </div>
@@ -48,7 +79,7 @@ const SingleCommentContainer = ({ comment }) => {
                         </IconButton>
                     </li>
                     <li>
-                        <IconButton onClick={openCommentSec}>
+                        <IconButton onClick={openCommentSec} disabled={searchParams2 === comment.sender.uid ? true : false}>
                             <i className="fa-regular fa-comment" style={{ fontSize: "16px", color: "#4a4a4a" }}></i>
                         </IconButton>
                     </li>
