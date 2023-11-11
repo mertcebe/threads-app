@@ -9,6 +9,7 @@ import { auth } from '../../../firebase/firebaseConfig';
 import { useNavigate } from 'react-router';
 import { NavLink, useSearchParams } from 'react-router-dom';
 import { getCommentsFrom } from '../postActions';
+import Moment from 'react-moment'
 
 const Post = ({ post }) => {
   let [posts, setPosts] = useState();
@@ -77,7 +78,7 @@ const Post = ({ post }) => {
                 {
                   comments?.slice(0, 2).map((comment, index) => {
                     return (
-                      <NavLink to={auth.currentUser.uid === comment.sender.uid?`/profile`:`/profile/${comment.sender.uid}`}>
+                      <NavLink to={auth.currentUser.uid === comment.sender.uid ? `/profile` : `/profile/${comment.sender.uid}`}>
                         <img src={comment.sender.photoURL ? comment.sender.photoURL : profileImg} alt="" style={{ width: "20px", height: "20px", borderRadius: "50%", transform: `translateX(${index * 10}px)`, position: "absolute" }} />
                       </NavLink>
                     )
@@ -92,6 +93,10 @@ const Post = ({ post }) => {
             </div>
           </div>
         }
+        <div className='text-light' style={{opacity: "0.2", position: "relative", left: "-30px"}}>
+          <span>-</span>
+          <Moment utc style={{ fontSize: "11px"}}>{post.dateAdded}</Moment>
+        </div>
       </div>
     </div>
   )

@@ -13,6 +13,7 @@ import TopBar from '../components/navbars/topbar'
 import RightBar from '../components/navbars/rightbar'
 import CreatePage from '../components/create'
 import SinglePostPage from '../components/posts/singlePost'
+import ProfilePage from '../components/profile'
 
 const AppRouter = () => {
   let { isAuthorized, loading } = useAuthorized();
@@ -39,6 +40,9 @@ const AppRouter = () => {
               <Route path='/' element={<Home />} />
               <Route path='/post' element={<SinglePostPage />} />
               <Route path='/create' element={<CreatePage />} />
+              <Route path='/profile' element={<ProfilePage />}>
+                <Route path=':id' element={<ProfilePage />} />
+              </Route>
             </Route>
 
             {/* Public Route */}

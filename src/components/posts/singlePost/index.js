@@ -28,7 +28,6 @@ const SinglePostPage = () => {
         getSinglePost(searchParams)
             .then((post) => {
                 setPost(post);
-                console.log(post)
                 getCommentsFrom(post.id)
                     .then((comments) => {
                         setComments(comments);
@@ -70,15 +69,15 @@ const SinglePostPage = () => {
             }
         };
         setCommentInText('');
-        await sendCommentsInTo(post.id, startCommentInComment?.commentIn.id, startCommentInComment?.commentIn.ownerUid, comment);
+        sendCommentsInTo(post.id, startCommentInComment?.commentIn.id, startCommentInComment?.commentIn.ownerUid, comment);
         //? Burayı hallet
-        // getCommentsInFrom(searchParams, startCommentInComment?.commentIn.id)
-        //     .then((snapshot) => {
-        //         startCommentInCommentFunc(dispatch, {
-        //             comments: snapshot,
-        //             commentIn: startCommentInComment?.commentIn
-        //         });
-        //     })
+        getCommentsInFrom(searchParams, startCommentInComment?.commentIn.id)
+            .then((snapshot) => {
+                startCommentInCommentFunc(dispatch, {
+                    comments: snapshot,
+                    commentIn: startCommentInComment?.commentIn
+                });
+            })
     }
 
     if (!post) {
@@ -153,7 +152,7 @@ const SinglePostPage = () => {
                                                             {
                                                                 startCommentInComment?.comments.map((comment) => {
                                                                     return (
-                                                                        <SingleCommentContainer comment={comment} />
+                                                                        <SingleCommentContainer comment={comment} type={'commentIn'} />
                                                                     )
                                                                 })
                                                             }
