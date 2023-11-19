@@ -125,15 +125,20 @@ const SignInPage = () => {
     }
 
     const resetPasswordFunc = () => {
-        sendPasswordResetEmail(auth, email)
-            .then(() => {
-                toast.dark(`Send reset password to ${email}`);
-            })
-            .catch((err) => {
-                const errorCode = err.code;
-                const message = errorCode.replace('/', ' error: ').split('-').join(' ');
-                toast.dark(message);
-            })
+        if (email) {
+            sendPasswordResetEmail(auth, email)
+                .then(() => {
+                    toast.dark(`Send reset password to ${email}`);
+                })
+                .catch((err) => {
+                    const errorCode = err.code;
+                    const message = errorCode.replace('/', ' error: ').split('-').join(' ');
+                    toast.dark(message);
+                })
+        }
+        else{
+            toast.dark('Enter an email!');
+        }
     }
 
     return (
@@ -172,7 +177,7 @@ const SignInPage = () => {
                     }
                     {
                         searchParams === 'reset-password' ?
-                            <div><small className='text-muted'>Did you remember your password?</small> <Link to={'/login?sign=in'} style={{ color: "grey", textDecoration: "none", fontSize: "14px", display: "inline-block", margin: "12px 0" }}>Sign in</Link></div>
+                            <div><small className='text-muted'>Did you remember your password?</small> <Link to={'/login?sign=in'} style={{ textDecoration: "none", fontSize: "14px", display: "inline-block", margin: "12px 0" }}>Sign in</Link></div>
                             :
                             <Link to={'/login?sign=reset-password'} style={{ color: "grey", textDecoration: "none", fontSize: "14px", display: "inline-block", margin: "12px 0" }}>Forgot password?</Link>
                     }

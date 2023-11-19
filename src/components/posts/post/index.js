@@ -72,30 +72,35 @@ const Post = ({ post }) => {
         </ul>
         {
           comments?.length !== 0 &&
-          <div style={{ position: "relative", height: "30px", zIndex: 100 }}>
-            <div style={{ position: "absolute", display: "flex", alignItems: "center", top: "0", left: "-40px" }}>
-              <div style={{ position: "relative", width: "34px", height: "20px" }}>
-                {
-                  comments?.slice(0, 2).map((comment, index) => {
-                    return (
-                      <NavLink to={auth.currentUser.uid === comment.sender.uid ? `/profile` : `/profile/${comment.sender.uid}`}>
-                        <img src={comment.sender.photoURL ? comment.sender.photoURL : profileImg} alt="" style={{ width: "20px", height: "20px", borderRadius: "50%", transform: `translateX(${index * 10}px)`, position: "absolute" }} />
-                      </NavLink>
-                    )
-                  })
-                }
+          <>
+            {
+              comments &&
+              <div style={{ position: "relative", height: "30px", zIndex: 100 }}>
+                <div style={{ position: "absolute", display: "flex", alignItems: "center", top: "0", left: "-40px" }}>
+                  <div style={{ position: "relative", width: "34px", height: "20px" }}>
+                    {
+                      comments?.slice(0, 2).map((comment, index) => {
+                        return (
+                          <NavLink to={auth.currentUser.uid === comment.sender.uid ? `/profile` : `/profile/${comment.sender.uid}`}>
+                            <img src={comment.sender.photoURL ? comment.sender.photoURL : profileImg} alt="" style={{ width: "20px", height: "20px", borderRadius: "50%", transform: `translateX(${index * 10}px)`, position: "absolute" }} />
+                          </NavLink>
+                        )
+                      })
+                    }
+                  </div>
+                  <small className='text-light' style={{ opacity: "0.3", fontSize: "14px", cursor: searchParams === post.id ? "context-menu" : "pointer" }} onClick={() => {
+                    if (searchParams !== post.id) {
+                      navigate(`/post?id=${post.id}`);
+                    }
+                  }}>{comments?.length} {comments?.length === 1 ? 'reply' : 'replies'}</small>
+                </div>
               </div>
-              <small className='text-light' style={{ opacity: "0.3", fontSize: "14px", cursor: searchParams === post.id ? "context-menu" : "pointer" }} onClick={() => {
-                if (searchParams !== post.id) {
-                  navigate(`/post?id=${post.id}`);
-                }
-              }}>{comments?.length} {comments?.length === 1 ? 'reply' : 'replies'}</small>
-            </div>
-          </div>
+            }
+          </>
         }
-        <div className='text-light' style={{opacity: "0.2", position: "relative", left: "-30px"}}>
+        <div className='text-light' style={{ opacity: "0.2", position: "relative", left: "-30px" }}>
           <span>-</span>
-          <Moment utc style={{ fontSize: "11px"}}>{post.dateAdded}</Moment>
+          <Moment utc style={{ fontSize: "11px" }}>{post.dateAdded}</Moment>
         </div>
       </div>
     </div>

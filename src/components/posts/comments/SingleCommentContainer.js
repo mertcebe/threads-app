@@ -107,7 +107,11 @@ const SingleCommentContainer = ({ comment, type }) => {
                                 </IconButton>
                             </li>
                             :
-                            <></>
+                            <li>
+                                <IconButton onClick={openCommentSec} disabled={searchParams2 === comment.sender.uid ? true : false}>
+                                    <i className="fa-regular fa-comment" style={{ fontSize: "16px", color: "#4a4a4a" }}></i>
+                                </IconButton>
+                            </li>
                     }
                     <li>
                         <IconButton>
@@ -136,7 +140,6 @@ const SingleCommentContainer = ({ comment, type }) => {
                                                     )
                                                 })
                                             }
-
                                         </div>
                                         <small className='text-light' style={{ position: "relative", left: "-8px", bottom: "22px", opacity: "0.3", fontSize: "14px" }}>{commentsIn?.length} {commentsIn?.length === 1 ? 'reply' : 'replies'}</small>
                                     </div>

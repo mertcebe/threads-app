@@ -1,12 +1,34 @@
-import { doc, getDoc } from "firebase/firestore"
-import database from "../../firebase/firebaseConfig"
+import { collection, doc, getDoc, getDocs, orderBy, query } from "firebase/firestore"
+import database, { auth } from "../../firebase/firebaseConfig"
 
 export const getUser = (uid) => {
     return new Promise((resolve) => {
         getDoc(doc(database, `users/${uid}`))
             .then((snapshot) => {
-                console.log(snapshot.data(), uid)
                 resolve(snapshot.data());
+            })
+    })
+}
+
+export const getUserPosts = (uid) => {
+    const user = {
+        displayName: auth.currentUser.displayName,
+        email: auth.currentUser.email,
+        uid: auth.currentUser.uid,
+        photoURL: auth.currentUser.photoURL
+    };
+    return new Promise((resolve) => {
+        getDocs(query(collection(database, `users/${uid}/posts`), orderBy('dateAdded', 'desc')))
+            .then((snapshot) => {
+                let posts = [];
+                snapshot.forEach((post) => {
+                    posts.push({
+                        ...post.data(),
+                        id: post.id,
+                        owner: user
+                    });
+                })
+                resolve(posts);
             })
     })
 }

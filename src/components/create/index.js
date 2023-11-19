@@ -7,6 +7,7 @@ import { setImagesToStorage } from '../../images/imageActions';
 import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import loadingGif from '../../images/gifThreads.gif'
+import plusImage from '../../images/plusImage.png'
 
 const MyButton = styled.button`
   background: #b075e6;
@@ -52,10 +53,10 @@ const CreatePage = () => {
                 images: snapshot,
                 owner: user
               })
-              .then(() => {
-                toast.dark('Posted a thread!');
-                setLoading(false);
-              })
+                .then(() => {
+                  toast.dark('Posted a thread!');
+                  setLoading(false);
+                })
             })
         })
     }
@@ -80,9 +81,9 @@ const CreatePage = () => {
   return (
     <div style={{ width: "calc(100% - 534.28px)", boxSizing: "border-box", padding: "40px 30px" }}>
       {
-        loading&&
-        <div style={{position: "absolute", top: "0", left: "0", backdropFilter: "brightness(0.6)", width: "100%", height: "100vh", zIndex: "100"}}>
-          <div style={{position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", color: "#fff"}}>
+        loading &&
+        <div style={{ position: "absolute", top: "0", left: "0", backdropFilter: "brightness(0.6)", width: "100%", height: "100vh", zIndex: "100" }}>
+          <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", color: "#fff" }}>
             <img src={loadingGif} alt="" />
           </div>
         </div>
@@ -112,8 +113,8 @@ const CreatePage = () => {
               return (
                 <div style={{ position: "relative" }}>
                   <img src={file.src} alt='' style={{ width: "120px", height: "120px", margin: "5px", borderRadius: "5px", filter: "brightness(0.7)" }} />
-                  <IconButton style={{ position: "absolute", top: "0", right: "10px" }} onClick={() => {
-                    let allFiles = files.filter((item) => item.file.name !== file.file.name)
+                  <IconButton style={{ position: "absolute", top: "0", right: "0px" }} onClick={() => {
+                    let allFiles = files.filter((item) => item.src !== file.src)
                     setFiles(allFiles);
                   }}>
                     <DoDisturbOnIcon sx={{ fontSize: "20px", color: "#fff" }} />
@@ -122,9 +123,30 @@ const CreatePage = () => {
               )
             })
           }
+          {
+            files.length !== 0 &&
+            <div>
+              <input type="file" id='addImageFileInput' multiple style={{ display: "none" }} onChange={(e) => {
+                let plusFiles = [];
+                for (let i = 0; i < e.target.files.length; i++) {
+                  let url = URL.createObjectURL(e.target.files[i]);
+                  plusFiles.push({
+                    src: url,
+                    file: e.target.files[i]
+                  });
+                }
+                setFiles([...files, ...plusFiles]);
+              }} />
+              <button style={{ width: "120px", height: "120px", position: "relative", margin: "5px", cursor: "pointer", border: "none", outline: "none", filter: "brightness(0.6)", background: "#fff", borderRadius: "5px" }} onClick={() => {
+                document.getElementById('addImageFileInput').click();
+              }}>
+                <img src={plusImage} alt='' style={{ width: "100%", height: "100%", pointerEvents: "none" }} />
+              </button>
+            </div>
+          }
         </div>
       }
-      <MyButton onClick={postFunc} disabled={text || files.length !== 0 ?false:true} style={{opacity: text || files.length !== 0 ?'1':'0.7'}}>Post Thread</MyButton>
+      <MyButton onClick={postFunc} disabled={text || files.length !== 0 ? false : true} style={{ opacity: text || files.length !== 0 ? '1' : '0.7' }}>Post Thread</MyButton>
     </div>
   )
 }

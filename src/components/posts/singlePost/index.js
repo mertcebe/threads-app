@@ -108,6 +108,7 @@ const SinglePostPage = () => {
                                             <button disabled={text ? false : true} style={{ width: "100px", height: "34px", background: "#a675e6", border: "none", outline: "none", color: "#fff", borderRadius: "30px", opacity: text ? '1' : '0.6' }} onClick={sendCommentFunc}>Reply</button>
                                         </form>
 
+                                        {/* comments */}
                                         <div className='mt-3'>
                                             {
                                                 comments?.length > 0 ?
@@ -121,7 +122,9 @@ const SinglePostPage = () => {
                                                         }
                                                     </>
                                                     :
-                                                    <></>
+                                                    <div>
+                                                        <i>No comments</i>
+                                                    </div>
                                             }
                                         </div>
                                     </div>
@@ -133,44 +136,40 @@ const SinglePostPage = () => {
                         {
                             startCommentInComment ?
                                 <>
-                                    <>
-                                        <SingleCommentContainer comment={startCommentInComment?.commentIn} />
-                                        <div>
-                                            {/* input */}
-                                            <form style={{ borderTop: "1px solid #161616", borderBottom: "1px solid #161616", padding: "10px 0" }} onSubmit={sendCommentInFunc}>
-                                                <img src={post.owner.photoURL ? post.owner.photoURL : defaultProfileImg} alt="" style={{ width: "40px", height: "40px", borderRadius: "50%" }} />
-                                                <input type="text" value={commentIntext} style={{ width: "calc(100% - 150px)", margin: "0 5px", height: "40px", background: "transparent", color: "#fff", outline: "none", border: "none" }} onChange={(e) => {
-                                                    setCommentInText(e.target.value);
-                                                }} placeholder='Comment...' />
-                                                <button disabled={commentIntext ? false : true} style={{ width: "100px", height: "34px", background: "#a675e6", border: "none", outline: "none", color: "#fff", borderRadius: "30px", opacity: commentIntext ? '1' : '0.6' }} onClick={sendCommentInFunc}>Reply</button>
-                                            </form>
+                                    <SingleCommentContainer comment={startCommentInComment?.commentIn} />
+                                    <div>
+                                        {/* input */}
+                                        <form style={{ borderTop: "1px solid #161616", borderBottom: "1px solid #161616", padding: "10px 0" }} onSubmit={sendCommentInFunc}>
+                                            <img src={post.owner.photoURL ? post.owner.photoURL : defaultProfileImg} alt="" style={{ width: "40px", height: "40px", borderRadius: "50%" }} />
+                                            <input type="text" value={commentIntext} style={{ width: "calc(100% - 150px)", margin: "0 5px", height: "40px", background: "transparent", color: "#fff", outline: "none", border: "none" }} onChange={(e) => {
+                                                setCommentInText(e.target.value);
+                                            }} placeholder='Comment...' />
+                                            <button disabled={commentIntext ? false : true} style={{ width: "100px", height: "34px", background: "#a675e6", border: "none", outline: "none", color: "#fff", borderRadius: "30px", opacity: commentIntext ? '1' : '0.6' }} onClick={sendCommentInFunc}>Reply</button>
+                                        </form>
 
-                                            <div className='mt-3' style={{marginLeft: "20px"}}>
-                                                {
-                                                    startCommentInComment?.comments?.length > 0 ?
-                                                        <>
-                                                            {
-                                                                startCommentInComment?.comments.map((comment) => {
-                                                                    return (
-                                                                        <SingleCommentContainer comment={comment} type={'commentIn'} />
-                                                                    )
-                                                                })
-                                                            }
-                                                        </>
-                                                        :
-                                                        <></>
-                                                }
-                                            </div>
+                                        <div className='mt-3' style={{ marginLeft: "20px" }}>
+                                            {
+                                                startCommentInComment?.comments?.length > 0 ?
+                                                    <>
+                                                        {
+                                                            startCommentInComment?.comments.map((comment) => {
+                                                                return (
+                                                                    <SingleCommentContainer comment={comment} type={'commentIn'} />
+                                                                )
+                                                            })
+                                                        }
+                                                    </>
+                                                    :
+                                                    <></>
+                                            }
                                         </div>
-                                    </>
+                                    </div>
                                 </>
                                 :
                                 <Navigate to={`/post?id=${post.id}`} />
                         }
                     </>
             }
-
-
         </div>
     )
 }
