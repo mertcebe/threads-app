@@ -72,6 +72,12 @@ export const sendCommentsInTo = (postId, commentId, commentTo, commentData) => {
                 setDoc((doc(database, `users/${commentTo}/posts/${postId}/comments/${commentId}/commentsIn/${snapshot.id}`)), {
                     ...commentData
                 })
+                setDoc((doc(database, `users/${auth.currentUser.uid}/replies/${snapshot.id}`)), {
+                    ...commentData,
+                    type: 'commentIn',
+                    commentTo: {commentTo, commentId},
+                    postId: postId
+                })
             })
     })
 }
@@ -80,6 +86,7 @@ export const sendCommentTo = async (postId, uid, comment) => {
     await addDoc(collection(database, `users/${uid}/posts/${postId}/comments`), { ...comment, ownerUid: uid })
         .then((snapshot) => {
             setDoc(doc(database, `allPosts/${postId}/comments/${snapshot.id}`), { ...comment, ownerUid: uid });
+            setDoc(doc(database, `users/${auth.currentUser.uid}/replies/${snapshot.id}`), { ...comment, ownerUid: uid, type: 'comment', postId: postId });
         })
 }
 
@@ -87,14 +94,14 @@ export const deleteCommentOf = async (postId, ownerUid, commentId) => {
     await deleteDoc(doc(database, `users/${ownerUid}/posts/${postId}/comments/${commentId}`))
         .then(() => {
             deleteDoc(doc(database, `allPosts/${postId}/comments/${commentId}`));
+            deleteDoc(doc(database, `users/${auth.currentUser.uid}/replies/${commentId}`));
         })
 }
 
 export const deleteCommentInOf = async (postId, ownerUid, commentId, id) => {
-    console.log(`users/${ownerUid}/posts/${postId}/comments/${commentId}/commentsIn/${id}`);
-    console.log(`allPosts/${postId}/comments/${commentId}/commentsIn/${id}`);
     await deleteDoc(doc(database, `users/${ownerUid}/posts/${postId}/comments/${commentId}/commentsIn/${id}`))
         .then(() => {
             deleteDoc(doc(database, `allPosts/${postId}/comments/${commentId}/commentsIn/${id}`));
+            deleteDoc((doc(database, `users/${auth.currentUser.uid}/replies/${id}`)));
         })
 }

@@ -1,15 +1,15 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAaq2IGRwVWhyS144YniKXahGAE3zlwI98",
-  authDomain: "threads-app-e61b1.firebaseapp.com",
-  projectId: "threads-app-e61b1",
-  storageBucket: "threads-app-e61b1.appspot.com",
-  messagingSenderId: "284942103501",
-  appId: "1:284942103501:web:5b842bd672979784eb4a84",
-  measurementId: "G-0SJ64R1TV2"
+  apiKey: "AIzaSyAyjJrPpKiHG9VBkMfsGUKI_eoPC_4XHa4",
+  authDomain: "react-threads-app.firebaseapp.com",
+  projectId: "react-threads-app",
+  storageBucket: "react-threads-app.appspot.com",
+  messagingSenderId: "771820949852",
+  appId: "1:771820949852:web:7fdd6c457c901239173199",
+  measurementId: "G-GMN0HXQG3V"
 };
 
 const app = initializeApp(firebaseConfig);

@@ -32,3 +32,19 @@ export const getUserPosts = (uid) => {
             })
     })
 }
+
+export const getUserReplies = (uid) => {
+    return new Promise((resolve) => {
+        getDocs(query(collection(database, `users/${uid}/replies`), orderBy('dateSended', 'desc')))
+            .then((snapshot) => {
+                let comments = [];
+                snapshot.forEach((comment) => {
+                    comments.push({
+                        ...comment.data(),
+                        id: comment.id
+                    });
+                })
+                resolve(comments);
+            })
+    })
+}

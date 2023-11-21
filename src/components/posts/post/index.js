@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router';
 import { NavLink, useSearchParams } from 'react-router-dom';
 import { getCommentsFrom } from '../postActions';
 import Moment from 'react-moment'
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const Post = ({ post }) => {
   let [posts, setPosts] = useState();
@@ -34,6 +35,10 @@ const Post = ({ post }) => {
     navigate(`/post?id=${post.id}`);
   }
 
+  const deletePostFunc = () => {
+    
+  }
+
   return (
     <div style={{ display: "flex", alignItems: "start", background: "#161616", margin: "30px 0", padding: "14px", borderRadius: "10px", position: "relative" }}>
       <div>
@@ -44,6 +49,12 @@ const Post = ({ post }) => {
         <div style={{ marginLeft: "8px" }}>
           <p className='m-0 p-0 text-light'><b>{post.owner.displayName}</b></p>
           <small style={{ color: "#dfdfdf" }}>{post.text}</small>
+          {
+            auth.currentUser.uid === post.owner.uid &&
+            <IconButton style={{ position: "absolute", top: "10px", right: "10px" }} onClick={deletePostFunc}>
+              <DeleteIcon sx={{ color: "red", fontSize: "18px" }} />
+            </IconButton>
+          }
         </div>
         <ul className={`${style.ulEl}`}>
           <li>
