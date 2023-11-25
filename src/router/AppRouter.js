@@ -14,6 +14,7 @@ import RightBar from '../components/navbars/rightbar'
 import CreatePage from '../components/create'
 import SinglePostPage from '../components/posts/singlePost'
 import ProfilePage from '../components/profile'
+import EditPage from '../components/profile/EditPage'
 
 const AppRouter = () => {
   let { isAuthorized, loading } = useAuthorized();
@@ -43,6 +44,7 @@ const AppRouter = () => {
               <Route path='/profile' element={<ProfilePage />}>
                 <Route path=':id' element={<ProfilePage />} />
               </Route>
+              <Route path='/profile/edit' element={<EditPage />} />
             </Route>
 
             {/* Public Route */}

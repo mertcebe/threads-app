@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, setDoc } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, setDoc, where } from "firebase/firestore";
 import database, { auth } from "../../../firebase/firebaseConfig";
 
 export const getAllPosts = () => {
@@ -75,9 +75,10 @@ export const sendCommentsInTo = (postId, commentId, commentTo, commentData) => {
                 setDoc((doc(database, `users/${auth.currentUser.uid}/replies/${snapshot.id}`)), {
                     ...commentData,
                     type: 'commentIn',
-                    commentTo: {commentTo, commentId},
+                    commentTo: { commentTo, commentId },
                     postId: postId
                 })
+                addDoc(collection(database, `users/${auth.currentUser.uid}/newMoves`), { type: 'reply' });
             })
     })
 }
@@ -87,6 +88,7 @@ export const sendCommentTo = async (postId, uid, comment) => {
         .then((snapshot) => {
             setDoc(doc(database, `allPosts/${postId}/comments/${snapshot.id}`), { ...comment, ownerUid: uid });
             setDoc(doc(database, `users/${auth.currentUser.uid}/replies/${snapshot.id}`), { ...comment, ownerUid: uid, type: 'comment', postId: postId });
+            addDoc(collection(database, `users/${auth.currentUser.uid}/newMoves`), { type: 'reply' });
         })
 }
 
@@ -104,4 +106,36 @@ export const deleteCommentInOf = async (postId, ownerUid, commentId, id) => {
             deleteDoc(doc(database, `allPosts/${postId}/comments/${commentId}/commentsIn/${id}`));
             deleteDoc((doc(database, `users/${auth.currentUser.uid}/replies/${id}`)));
         })
+}
+
+export const getNewPosts = async () => {
+    return new Promise((resolve) => {
+        getDocs(query(collection(database, `users/${auth.currentUser.uid}/newMoves`), where('type', '==', 'post')))
+            .then((snapshot) => {
+                let moves = [];
+                snapshot.forEach((move) => {
+                    moves.push({
+                        ...move.data(),
+                        id: move.id
+                    });
+                })
+                resolve(moves);
+            })
+    })
+}
+
+export const getNewReplies = async () => {
+    return new Promise((resolve) => {
+        getDocs(query(collection(database, `users/${auth.currentUser.uid}/newMoves`), where('type', '==', 'reply')))
+            .then((snapshot) => {
+                let moves = [];
+                snapshot.forEach((move) => {
+                    moves.push({
+                        ...move.data(),
+                        id: move.id
+                    });
+                })
+                resolve(moves);
+            })
+    })
 }

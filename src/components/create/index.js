@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 import loadingGif from '../../images/gifThreads.gif'
 import plusImage from '../../images/plusImage.png'
 
-const MyButton = styled.button`
+export const MyButton = styled.button`
   background: #b075e6;
   color: #fff;
   border-radius: 10px;
@@ -43,6 +43,7 @@ const CreatePage = () => {
     if (files.length !== 0) {
       setImagesToStorage(files, auth.currentUser.uid)
         .then((snapshot) => {
+          addDoc(collection(database, `users/${auth.currentUser.uid}/newMoves`), {type: 'post'});
           addDoc(collection(database, `users/${auth.currentUser.uid}/posts`), {
             ...post,
             images: snapshot,
@@ -61,6 +62,7 @@ const CreatePage = () => {
         })
     }
     else {
+      addDoc(collection(database, `users/${auth.currentUser.uid}/newMoves`), {type: 'post'});
       addDoc(collection(database, `users/${auth.currentUser.uid}/posts`), {
         ...post
       })

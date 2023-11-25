@@ -6,6 +6,7 @@ export const setImagesToStorage = (files, uploadRef) => {
 
         let allFiles = [];
         await files.map(async (file) => {
+            console.log(file)
             const metadata = {
                 contentType: `${file.file.type}`
             };

@@ -66,7 +66,7 @@ const Post = ({ post }) => {
             </IconButton>
           </li>
           <li>
-            <IconButton className={style.iconButton} disabled={useSearchParams()[0].get('id') === post.id} onClick={openCommentSec}>
+            <IconButton className={style.iconButton} disabled={searchParams === post.id} onClick={openCommentSec}>
               <i className="fa-regular fa-comment" style={{ fontSize: "18px", color: "#4a4a4a" }}></i>
             </IconButton>
           </li>
