@@ -81,7 +81,6 @@ const ProfilePage = () => {
         getUser(id ? id : auth.currentUser.uid)
             .then((snapshot) => {
                 setProfile(snapshot);
-                console.log(snapshot.photoURL)
                 if (snapshot) {
                     clearTimeout(time);
                 }
@@ -89,6 +88,7 @@ const ProfilePage = () => {
         getUserPosts(id ? id : auth.currentUser.uid)
             .then((snapshot) => {
                 setPosts(snapshot);
+                console.log(snapshot);
             })
         getUserReplies(id ? id : auth.currentUser.uid)
             .then((snapshot) => {
@@ -106,12 +106,12 @@ const ProfilePage = () => {
     }, [id]);
 
     const handleChange = (event, newValue) => {
-        if(newValue === 0){
+        if (newValue === 0) {
             postsLength.forEach((post) => {
                 deleteDoc(doc(database, `users/${auth.currentUser.uid}/newMoves/${post.id}`));
             })
         }
-        if(newValue === 1){
+        if (newValue === 1) {
             repliesLength.forEach((post) => {
                 deleteDoc(doc(database, `users/${auth.currentUser.uid}/newMoves/${post.id}`));
             })
@@ -126,7 +126,9 @@ const ProfilePage = () => {
 
     if (!profile) {
         return (
-            <h5>loading...</h5>
+            <div style={{ width: "calc(100% - 534.28px)", padding: "40px 30px" }}>
+                loading...
+            </div>
         )
     }
     return (
@@ -145,13 +147,13 @@ const ProfilePage = () => {
                         <>
                             {
                                 auth.currentUser.uid === id ?
-                                    <MyButton onClick={() => {navigate('/profile/edit')}}><i className="fa-regular fa-pen-to-square" style={{ fontSize: "14px", marginRight: "6px", color: "rebeccapurple" }}></i>Edit</MyButton>
+                                    <MyButton onClick={() => { navigate('/profile/edit') }}><i className="fa-regular fa-pen-to-square" style={{ fontSize: "14px", marginRight: "6px", color: "rebeccapurple" }}></i>Edit</MyButton>
                                     :
                                     <></>
                             }
                         </>
                         :
-                        <MyButton onClick={() => {navigate('/profile/edit')}}><i className="fa-regular fa-pen-to-square" style={{ fontSize: "14px", marginRight: "6px", color: "rebeccapurple" }}></i>Edit</MyButton>
+                        <MyButton onClick={() => { navigate('/profile/edit') }}><i className="fa-regular fa-pen-to-square" style={{ fontSize: "14px", marginRight: "6px", color: "rebeccapurple" }}></i>Edit</MyButton>
                 }
             </div>
 
@@ -166,8 +168,8 @@ const ProfilePage = () => {
                     onChange={handleChange}
                     aria-label="styled tabs example"
                 >
-                    <StyledTab label={<div style={{ display: "flex", alignContent: "center" }}><i className="fa-regular fa-comment-dots" style={{ marginRight: "10px" }}></i><span>Threads</span>{postsLength.length !== 0&&<MySpan>{postsLength.length}</MySpan>}</div>} />
-                    <StyledTab label={<div style={{ display: "flex", alignContent: "center", opacity: id ? id !== auth.currentUser.uid && '0.4' : '1', cursor: id ? id !== auth.currentUser.uid && 'auto' : 'pointer' }}><i className="fa-solid fa-user-group" style={{ marginRight: "10px" }}></i><span>Replies</span>{id ? id === auth.currentUser.uid && repliesLength.length !== 0&&<MySpan>{repliesLength.length}</MySpan> : repliesLength.length !== 0&&<MySpan>{repliesLength.length}</MySpan>}</div>} />
+                    <StyledTab label={<div style={{ display: "flex", alignContent: "center" }}><i className="fa-regular fa-comment-dots" style={{ marginRight: "10px" }}></i><span>Threads</span>{postsLength.length !== 0 && <MySpan>{postsLength.length}</MySpan>}</div>} />
+                    <StyledTab label={<div style={{ display: "flex", alignContent: "center", opacity: id ? id !== auth.currentUser.uid && '0.4' : '1', cursor: id ? id !== auth.currentUser.uid && 'auto' : 'pointer' }}><i className="fa-solid fa-user-group" style={{ marginRight: "10px" }}></i><span>Replies</span>{id ? id === auth.currentUser.uid && repliesLength.length !== 0 && <MySpan>{repliesLength.length}</MySpan> : repliesLength.length !== 0 && <MySpan>{repliesLength.length}</MySpan>}</div>} />
                     <StyledTab label={<div style={{ display: "flex", alignContent: "center", opacity: id ? id !== auth.currentUser.uid && '0.4' : '1', cursor: id ? id !== auth.currentUser.uid && 'auto' : 'pointer' }}><i className="fa-solid fa-tag" style={{ marginRight: "10px" }}></i><span>Tags</span></div>} />
                 </StyledTabs>
             </Box>

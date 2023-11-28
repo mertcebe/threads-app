@@ -15,6 +15,7 @@ import CreatePage from '../components/create'
 import SinglePostPage from '../components/posts/singlePost'
 import ProfilePage from '../components/profile'
 import EditPage from '../components/profile/EditPage'
+import SearchPage from '../components/search'
 
 const AppRouter = () => {
   let { isAuthorized, loading } = useAuthorized();
@@ -39,6 +40,7 @@ const AppRouter = () => {
             {/* Private Route */}
             <Route element={<PrivateRoute isAuthorized={isAuthorized} />}>
               <Route path='/' element={<Home />} />
+              <Route path='/search' element={<SearchPage />} />
               <Route path='/post' element={<SinglePostPage />} />
               <Route path='/create' element={<CreatePage />} />
               <Route path='/profile' element={<ProfilePage />}>

@@ -11,25 +11,23 @@ export const getUser = (uid) => {
 }
 
 export const getUserPosts = (uid) => {
-    const user = {
-        displayName: auth.currentUser.displayName,
-        email: auth.currentUser.email,
-        uid: auth.currentUser.uid,
-        photoURL: auth.currentUser.photoURL
-    };
     return new Promise((resolve) => {
-        getDocs(query(collection(database, `users/${uid}/posts`), orderBy('dateAdded', 'desc')))
-            .then((snapshot) => {
-                let posts = [];
-                snapshot.forEach((post) => {
-                    posts.push({
-                        ...post.data(),
-                        id: post.id,
-                        owner: user
-                    });
-                })
-                resolve(posts);
+        getUser(uid)
+            .then((snapshotForUser) => {
+                getDocs(query(collection(database, `users/${uid}/posts`), orderBy('dateAdded', 'desc')))
+                    .then((snapshot) => {
+                        let posts = [];
+                        snapshot.forEach((post) => {
+                            posts.push({
+                                ...post.data(),
+                                id: post.id,
+                                owner: snapshotForUser
+                            });
+                        })
+                        resolve(posts);
+                    })
             })
+
     })
 }
 
