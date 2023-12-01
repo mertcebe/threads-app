@@ -16,6 +16,7 @@ import SinglePostPage from '../components/posts/singlePost'
 import ProfilePage from '../components/profile'
 import EditPage from '../components/profile/EditPage'
 import SearchPage from '../components/search'
+import CommuntiesPage from '../components/communties'
 
 const AppRouter = () => {
   let { isAuthorized, loading } = useAuthorized();
@@ -43,6 +44,7 @@ const AppRouter = () => {
               <Route path='/search' element={<SearchPage />} />
               <Route path='/post' element={<SinglePostPage />} />
               <Route path='/create' element={<CreatePage />} />
+              <Route path='/communities' element={<CommuntiesPage />} />
               <Route path='/profile' element={<ProfilePage />}>
                 <Route path=':id' element={<ProfilePage />} />
               </Route>
