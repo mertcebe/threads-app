@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { MyInput } from '../profile/EditPage'
 import { collection, getDocs, query } from 'firebase/firestore';
 import database, { auth } from '../../firebase/firebaseConfig';
+import SingleCommunityContainer from './SingleCommunityContainer';
 
 const CommuntiesPage = () => {
     let [communities, setCommunities] = useState();
@@ -10,13 +11,14 @@ const CommuntiesPage = () => {
         return new Promise((resolve) => {
             getDocs(query(collection(database, `communities`)))
                 .then((snapshot) => {
-                    let users = [];
-                    snapshot.forEach((user) => {
-                        users.push({
-                            ...user.data()
+                    let communities = [];
+                    snapshot.forEach((community) => {
+                        communities.push({
+                            ...community.data(),
+                            id: community.id
                         })
                     });
-                    resolve(users);
+                    resolve(communities);
                 })
         })
     }
@@ -43,8 +45,14 @@ const CommuntiesPage = () => {
             }} placeholder='Search communities' />
             <hr style={{ color: "rebeccapurple" }} />
             
-            <div>
-
+            <div style={{display: "flex", flexWrap: "wrap", width: "100%"}}>
+                {
+                    communities.map((community) => {
+                        return (
+                            <SingleCommunityContainer community={community} />
+                        )
+                    })
+                }
             </div>
         </div>
     )
