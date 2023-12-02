@@ -43,10 +43,12 @@ const CommunitiesCreateBox = () => {
             }
         }
         await setCommunitiesToFirebase(communities)
-        setLoading(false);
-        setFile();
-        openCommunitiesMenuFunc(dispatch, false);
-        openCommunitiesInviteFunc(dispatch, true);
+            .then((snapshot) => {
+                setLoading(false);
+                setFile();
+                openCommunitiesMenuFunc(dispatch, false);
+                openCommunitiesInviteFunc(dispatch, snapshot, true);
+            })
     }
 
     return (
@@ -57,10 +59,6 @@ const CommunitiesCreateBox = () => {
                         <CloseIcon style={{ fontSize: "16px" }} />
                     </IconButton>
                 </div>
-                <button onClick={() => {
-                    openCommunitiesMenuFunc(dispatch, false);
-                    openCommunitiesInviteFunc(dispatch, true);
-                }}>open</button>
                 <div style={{ color: "#000", pointerEvents: loading ? 'none' : '' }}>
                     <h5 style={{ fontWeight: "bold" }}>Create Organization</h5>
                     <div style={{ display: "flex", alignItems: "center", margin: "20px 0 10px 0" }}>

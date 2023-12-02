@@ -139,3 +139,19 @@ export const getNewReplies = async () => {
             })
     })
 }
+
+export const getNewInvitations = async () => {
+    return new Promise((resolve) => {
+        getDocs(query(collection(database, `users/${auth.currentUser.uid}/newMoves`), where('type', '==', 'invitations')))
+            .then((snapshot) => {
+                let moves = [];
+                snapshot.forEach((move) => {
+                    moves.push({
+                        ...move.data(),
+                        id: move.id
+                    });
+                })
+                resolve(moves);
+            })
+    })
+}

@@ -46,3 +46,19 @@ export const getUserReplies = (uid) => {
             })
     })
 }
+
+export const getUserInvitations = (uid) => {
+    return new Promise((resolve) => {
+        getDocs(query(collection(database, `users/${uid}/communitiesInvite`), orderBy('dateSended', 'desc')))
+            .then((snapshot) => {
+                let invitations = [];
+                snapshot.forEach((invitation) => {
+                    invitations.push({
+                        ...invitation.data(),
+                        id: invitation.id
+                    });
+                })
+                resolve(invitations);
+            })
+    })
+}

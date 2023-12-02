@@ -2,14 +2,15 @@ import React, { useEffect, useState } from 'react'
 import defaultProfileImg from '../../images/twitterProfileImg.png'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import database, { auth } from '../../firebase/firebaseConfig';
-import { getUser, getUserPosts, getUserReplies } from './profileActions';
+import { getUser, getUserInvitations, getUserPosts, getUserReplies } from './profileActions';
 import styled from '@emotion/styled';
 import { Box, Tabs, Tab, Fade } from '@mui/material';
 import Post from '../posts/post';
 import SingleCommentContainer from '../posts/comments/SingleCommentContainer';
 import { toast } from 'react-toastify';
-import { getNewPosts, getNewReplies } from '../posts/postActions';
+import { getNewInvitations, getNewPosts, getNewReplies } from '../posts/postActions';
 import { deleteDoc, doc } from 'firebase/firestore';
+import InvitationContainer from '../communties/invitations';
 
 const MyButton = styled.button`
     display: flex;
@@ -69,9 +70,11 @@ const ProfilePage = () => {
     let [profile, setProfile] = useState();
     let [posts, setPosts] = useState([]);
     let [replies, setReplies] = useState([]);
+    let [invitations, setInvitations] = useState([]);
     const [value, setValue] = useState(0);
     const [postsLength, setPostsLength] = useState([]);
     const [repliesLength, setRepliesLength] = useState([]);
+    const [invitationsLength, setInvitationsLength] = useState([]);
     const { id } = useParams();
     const navigate = useNavigate();
     useEffect(() => {
@@ -94,14 +97,21 @@ const ProfilePage = () => {
             .then((snapshot) => {
                 setReplies(snapshot);
             })
+        getUserInvitations(id ? id : auth.currentUser.uid)
+            .then((snapshot) => {
+                setInvitations(snapshot);
+            })
         getNewPosts()
             .then((snapshot) => {
                 setPostsLength(snapshot);
             })
         getNewReplies()
             .then((snapshot) => {
-                console.log(snapshot.length);
                 setRepliesLength(snapshot);
+            })
+        getNewInvitations()
+            .then((snapshot) => {
+                setInvitationsLength(snapshot);
             })
     }, [id]);
 
@@ -170,7 +180,7 @@ const ProfilePage = () => {
                 >
                     <StyledTab label={<div style={{ display: "flex", alignContent: "center" }}><i className="fa-regular fa-comment-dots" style={{ marginRight: "10px" }}></i><span>Threads</span>{postsLength.length !== 0 && <MySpan>{postsLength.length}</MySpan>}</div>} />
                     <StyledTab label={<div style={{ display: "flex", alignContent: "center", opacity: id ? id !== auth.currentUser.uid && '0.4' : '1', cursor: id ? id !== auth.currentUser.uid && 'auto' : 'pointer' }}><i className="fa-solid fa-user-group" style={{ marginRight: "10px" }}></i><span>Replies</span>{id ? id === auth.currentUser.uid && repliesLength.length !== 0 && <MySpan>{repliesLength.length}</MySpan> : repliesLength.length !== 0 && <MySpan>{repliesLength.length}</MySpan>}</div>} />
-                    <StyledTab label={<div style={{ display: "flex", alignContent: "center", opacity: id ? id !== auth.currentUser.uid && '0.4' : '1', cursor: id ? id !== auth.currentUser.uid && 'auto' : 'pointer' }}><i className="fa-solid fa-tag" style={{ marginRight: "10px" }}></i><span>Tags</span></div>} />
+                    <StyledTab label={<div style={{ display: "flex", alignContent: "center", opacity: id ? id !== auth.currentUser.uid && '0.4' : '1', cursor: id ? id !== auth.currentUser.uid && 'auto' : 'pointer' }}><i className="fa-solid fa-tag" style={{ marginRight: "10px" }}></i><span>Invitations</span>{id ? id === auth.currentUser.uid && invitationsLength.length !== 0 && <MySpan>{invitationsLength.length}</MySpan> : invitationsLength.length !== 0 && <MySpan>{invitationsLength.length}</MySpan>}</div>} />
                 </StyledTabs>
             </Box>
 
@@ -202,6 +212,13 @@ const ProfilePage = () => {
                 {
                     value === 2 &&
                     <>
+                        {
+                            invitations.map((invitation) => {
+                                return (
+                                    <InvitationContainer invitation={invitation} />
+                                )
+                            })
+                        }
                     </>
                 }
             </div>

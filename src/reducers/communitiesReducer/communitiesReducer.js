@@ -1,6 +1,7 @@
 let initialState = {
     isOpenCommunitiesMenu: false,
-    isOpenCommunitiesInvite: false
+    isOpenCommunitiesInvite: false,
+    community: null
 };
 
 const CommunitiesReducer = (state = initialState, action) => {
@@ -13,6 +14,7 @@ const CommunitiesReducer = (state = initialState, action) => {
         case 'OPEN_COMMUNITIES_INVITE':
             return {
                 ...state,
+                community: action.community,
                 isOpenCommunitiesInvite: action.payload,
             };
         default:
