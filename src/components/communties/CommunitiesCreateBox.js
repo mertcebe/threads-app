@@ -21,6 +21,12 @@ const CommunitiesCreateBox = () => {
     const dispatch = useDispatch();
 
     const createFunc = async () => {
+        const user = {
+            displayName: auth.currentUser.displayName,
+            email: auth.currentUser.email,
+            uid: auth.currentUser.uid,
+            photoURL: auth.currentUser.photoURL
+        };
         let communities = {};
         setLoading(true);
         if (file) {
@@ -30,7 +36,8 @@ const CommunitiesCreateBox = () => {
                         communitiesName: communitiesText,
                         slugURL: slugURLText,
                         dateCreation: new Date().getTime(),
-                        photoURL: snapshot[0]
+                        photoURL: snapshot[0],
+                        admin: user
                     }
                 })
         }
@@ -39,7 +46,8 @@ const CommunitiesCreateBox = () => {
                 communitiesName: communitiesText,
                 slugURL: slugURLText,
                 dateCreation: new Date().getTime(),
-                photoURL: null
+                photoURL: null,
+                admin: user
             }
         }
         await setCommunitiesToFirebase(communities)
@@ -52,7 +60,7 @@ const CommunitiesCreateBox = () => {
     }
 
     return (
-        <div style={{ color: "#fff", width: "100%", height: "100vh", display: "flex", justifyContent: "center", alignItems: "center", position: "fixed", top: "0", left: "0", zIndex: "200" }}>
+        <div style={{ color: "#fff", width: "100%", height: "100vh", display: "flex", justifyContent: "center", alignItems: "center", position: "fixed", top: "0", left: "0", zIndex: "200", backdropFilter: "brightness(0.4)" }}>
             <div style={{ background: "#fff", padding: "10px", width: "400px", borderRadius: "10px" }}>
                 <div style={{ textAlign: "end" }}>
                     <IconButton onClick={() => { openCommunitiesMenuFunc(dispatch, false); }}>

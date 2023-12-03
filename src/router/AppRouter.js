@@ -44,7 +44,9 @@ const AppRouter = () => {
               <Route path='/search' element={<SearchPage />} />
               <Route path='/post' element={<SinglePostPage />} />
               <Route path='/create' element={<CreatePage />} />
-              <Route path='/communities' element={<CommuntiesPage />} />
+              <Route path='/communities' element={<CommuntiesPage />}>
+                <Route path=':id' element={<CommuntiesPage />} />
+              </Route>
               <Route path='/profile' element={<ProfilePage />}>
                 <Route path=':id' element={<ProfilePage />} />
               </Route>
