@@ -4,10 +4,25 @@ import Moment from 'react-moment';
 import { Button, IconButton, Tooltip } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { NavLink } from 'react-router-dom';
-import { deleteDoc, doc } from 'firebase/firestore';
+import { deleteDoc, doc, getDoc, setDoc } from 'firebase/firestore';
 import database, { auth } from '../../../firebase/firebaseConfig';
+import { toast } from 'react-toastify';
 
 const InvitationContainer = ({ invitation }) => {
+    const acceptInviteFunc = () => {
+        getDoc(doc(database, `users/${auth.currentUser.uid}`))
+            .then((snapshot) => {
+                setDoc(doc(database, `communities/${invitation.community.id}/members/${auth.currentUser.uid}`), {
+                    ...snapshot.data(),
+                    role: invitation.role,
+                    dateAccepted: new Date().getTime()
+                })
+                    .then(() => {
+                        toast.dark('Invitation was accepted!');
+                        deleteInvitationFunc();
+                    })
+            })
+    }
 
     const deleteInvitationFunc = () => {
         deleteDoc(doc(database, `users/${auth.currentUser.uid}/communitiesInvite/${invitation.id}`))
@@ -28,7 +43,7 @@ const InvitationContainer = ({ invitation }) => {
                 <small style={{ color: "grey" }}>~<Moment fromNow>{invitation.dateSended}</Moment></small>
             </div>
             <small className='d-block' style={{ color: "lightgray" }}>{invitation.message}</small>
-            <Tooltip title={invitation.role === 'member'?'This community has invited you to become a member':'This community has invited you to become a admin'}>
+            <Tooltip title={invitation.role === 'member' ? 'This community has invited you to become a member' : 'This community has invited you to become a admin'}>
                 <div style={{ color: "lightgray", background: "#000", display: "inline-block", padding: "2px 8px", borderRadius: "8px", margin: "8px 0", cursor: "default" }}>
                     {
                         invitation.role === 'member' ?
@@ -49,7 +64,7 @@ const InvitationContainer = ({ invitation }) => {
                     <IconButton sx={{ mr: "5px" }} onClick={deleteInvitationFunc}>
                         <DeleteIcon sx={{ color: "red", fontSize: "18px" }} />
                     </IconButton>
-                    <Button size='small' variant='outlined' color='info' style={{ fontSize: "10px" }}>Accept invitation</Button>
+                    <Button size='small' variant='outlined' color='info' style={{ fontSize: "10px" }} onClick={acceptInviteFunc}>Accept invitation</Button>
                 </div>
             </div>
         </div>

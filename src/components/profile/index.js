@@ -116,6 +116,19 @@ const ProfilePage = () => {
     }, [id]);
 
     const handleChange = (event, newValue) => {
+        getUserPosts(id ? id : auth.currentUser.uid)
+            .then((snapshot) => {
+                setPosts(snapshot);
+                console.log(snapshot);
+            })
+        getUserReplies(id ? id : auth.currentUser.uid)
+            .then((snapshot) => {
+                setReplies(snapshot);
+            })
+        getUserInvitations(id ? id : auth.currentUser.uid)
+            .then((snapshot) => {
+                setInvitations(snapshot);
+            })
         if (newValue === 0) {
             postsLength.forEach((post) => {
                 deleteDoc(doc(database, `users/${auth.currentUser.uid}/newMoves/${post.id}`));

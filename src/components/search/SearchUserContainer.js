@@ -1,7 +1,10 @@
 import styled from '@emotion/styled'
-import React from 'react'
-import { useNavigate } from 'react-router'
+import React, { useState } from 'react'
+import { useNavigate, useParams } from 'react-router'
 import profileImg from '../../images/twitterProfileImg.png'
+import { IconButton, Tooltip } from '@mui/material'
+import { doc, updateDoc } from 'firebase/firestore'
+import database from '../../firebase/firebaseConfig'
 
 export const MyViewButton = styled.button`
     border: none;
@@ -18,19 +21,54 @@ export const MyViewButton = styled.button`
 `
 
 const SearchUserContainer = ({ user }) => {
+    let [role, setRole] = useState(user.role);
     let navigate = useNavigate();
+    const {id} = useParams();
+    
+    const updateRole = (role) => {
+        updateDoc(doc(database, `communities/${id}/members/${user.uid}`), {
+            role: role
+        })
+        .then(() => {
+            setRole(role);
+        })
+    }
+
     return (
         <div className='d-flex justify-content-between align-items-center w-100' style={{ margin: "10px 0" }}>
             <div className='d-flex justify-content-between align-items-center'>
-                <img src={user.photoURL?user.photoURL:profileImg} alt="" style={{ width: "50px", height: "50px", borderRadius: "50%", pointerEvents: "none" }} />
+                <img src={user.photoURL ? user.photoURL : profileImg} alt="" style={{ width: "50px", height: "50px", borderRadius: "50%", pointerEvents: "none" }} />
                 <div style={{ marginLeft: "10px" }}>
                     <small className='d-block text-light' style={{ fontWeight: "bold", fontSize: "15px" }}>{user.displayName}</small>
                     <small className='d-block text-secondary' style={{ fontSize: "12px" }}>{user.email}</small>
                 </div>
             </div>
-            <MyViewButton onClick={() => {
-                navigate(`/profile/${user.uid}`)
-            }}>View</MyViewButton>
+            <div>
+                {
+                    user.role &&
+                    <Tooltip title={role === 'member' ? 'Member' : 'Admin'}>
+                        <div style={{ color: "lightgray", background: "#000", display: "inline-block", padding: "2px 8px", borderRadius: "8px", margin: "0 10px", cursor: "default" }}>
+                            {
+                                role === 'member' ?
+                                    <IconButton onClick={() => {
+                                        updateRole('admin');
+                                    }}>
+                                        <i className="fa-solid fa-user-large text-light" style={{fontSize: "14px"}}></i>
+                                    </IconButton>
+                                    :
+                                    <IconButton onClick={() => {
+                                        updateRole('member');
+                                    }}>
+                                        <i className="fa-solid fa-user-gear text-light" style={{fontSize: "14px"}}></i>
+                                    </IconButton>
+                            }
+                        </div>
+                    </Tooltip>
+                }
+                <MyViewButton onClick={() => {
+                    navigate(`/profile/${user.uid}`)
+                }}>View</MyViewButton>
+            </div>
         </div>
     )
 }

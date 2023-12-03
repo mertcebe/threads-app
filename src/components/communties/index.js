@@ -4,10 +4,11 @@ import { collection, doc, getDoc, getDocs, orderBy, query } from 'firebase/fires
 import database, { auth } from '../../firebase/firebaseConfig';
 import SingleCommunityContainer from './SingleCommunityContainer';
 import Skeleton from './skeleton';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import defaultBackImg from '../../images/threadsLogo.png'
 import styled from '@emotion/styled';
 import { Box, Tabs, Tab, Fade } from '@mui/material';
+import SearchUserContainer from '../search/SearchUserContainer';
 
 const MyButton = styled.button`
     display: flex;
@@ -67,8 +68,10 @@ const CommuntiesPage = () => {
     let [communities, setCommunities] = useState();
     let [searchText, setSearchText] = useState('');
     let [community, setCommunity] = useState();
+    let [communityMembers, setCommunityMembers] = useState();
     const [value, setValue] = useState(0);
     const { id } = useParams();
+    const navigate = useNavigate();
     const getAllCommunities = () => {
         return new Promise((resolve) => {
             getDocs(query(collection(database, `communities`), orderBy('communitiesName', 'asc')))
@@ -86,11 +89,23 @@ const CommuntiesPage = () => {
     }
 
     const getCommunity = (id) => {
-        console.log(id)
         return new Promise((resolve) => {
             getDoc(doc(database, `communities/${id}`))
                 .then((snapshot) => {
                     resolve(snapshot.data());
+                })
+        })
+    }
+
+    const getCommunityMembers = (id) => {
+        return new Promise((resolve) => {
+            getDocs(query(collection(database, `communities/${id}/members`)), orderBy('dateAccepted', 'desc'))
+                .then((snapshot) => {
+                    let members = [];
+                    snapshot.forEach((member) => {
+                        members.push(member.data());
+                    })
+                    resolve(members);
                 })
         })
     }
@@ -104,6 +119,10 @@ const CommuntiesPage = () => {
             .then((snapshot) => {
                 setCommunity(snapshot);
             })
+        getCommunityMembers(id)
+        .then((snapshot) => {
+            setCommunityMembers(snapshot);
+        })
     }, [id]);
 
     const handleChange = (event, newValue) => {
@@ -129,19 +148,17 @@ const CommuntiesPage = () => {
                             <small className='m-0 text-secondary' style={{ fontSize: "11px" }}>@{community.slugURL}</small>
                         </div>
                     </div>
-                    {/* {
-                        id ?
-                            <>
-                                {
-                                    auth.currentUser.uid === id ?
-                                        <MyButton onClick={() => { navigate('/profile/edit') }}><i className="fa-regular fa-pen-to-square" style={{ fontSize: "14px", marginRight: "6px", color: "rebeccapurple" }}></i>Edit</MyButton>
-                                        :
-                                        <></>
-                                }
-                            </>
-                            :
-                            <MyButton onClick={() => { navigate('/profile/edit') }}><i className="fa-regular fa-pen-to-square" style={{ fontSize: "14px", marginRight: "6px", color: "rebeccapurple" }}></i>Edit</MyButton>
-                    } */}
+                    {
+                        id &&
+                        <>
+                            {
+                                auth.currentUser.uid === community.admin?.uid ?
+                                    <MyButton onClick={() => { navigate(`/communities/${id}/edit`) }}><i className="fa-regular fa-pen-to-square" style={{ fontSize: "14px", marginRight: "6px", color: "rebeccapurple" }}></i>Edit</MyButton>
+                                    :
+                                    <></>
+                            }
+                        </>
+                    }
                 </div>
 
                 <div className='my-2 mb-4'>
@@ -157,7 +174,12 @@ const CommuntiesPage = () => {
                     >
                         <StyledTab label={<div style={{ display: "flex", alignContent: "center" }}><i className="fa-regular fa-comment-dots" style={{ marginRight: "10px" }}></i><span>Threads</span></div>} />
                         <StyledTab label={<div style={{ display: "flex", alignContent: "center" }}><i className="fa-solid fa-user-group" style={{ marginRight: "10px" }}></i><span>Members</span></div>} />
-                        <StyledTab label={<div style={{ display: "flex", alignContent: "center" }}><i className="fa-solid fa-user-plus" style={{ marginRight: "10px" }}></i><span>Requests</span></div>} />
+                        {
+                            auth.currentUser.uid === community.admin?.uid ?
+                                <StyledTab label={<div style={{ display: "flex", alignContent: "center" }}><i className="fa-solid fa-user-plus" style={{ marginRight: "10px" }}></i><span>Requests</span></div>} />
+                                :
+                                <StyledTab label={<div style={{ display: "flex", alignContent: "center" }}><i className="fa-solid fa-user-plus" style={{ marginRight: "10px" }}></i><span>Info</span></div>} />
+                        }
                     </StyledTabs>
                 </Box>
 
@@ -177,13 +199,19 @@ const CommuntiesPage = () => {
                     {
                         value === 1 &&
                         <>
-                            
+                            {
+                                communityMembers.map((member) => {
+                                    return (
+                                        <SearchUserContainer user={member} />
+                                    )
+                                })
+                            }
                         </>
                     }
                     {
                         value === 2 &&
                         <>
-                            
+
                         </>
                     }
                 </div>
