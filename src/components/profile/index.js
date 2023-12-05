@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import defaultProfileImg from '../../images/twitterProfileImg.png'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { NavLink, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import database, { auth } from '../../firebase/firebaseConfig';
-import { getUser, getUserInvitations, getUserPosts, getUserReplies } from './profileActions';
+import { getInvolvedCommunities, getUser, getUserInvitations, getUserPosts, getUserReplies } from './profileActions';
 import styled from '@emotion/styled';
-import { Box, Tabs, Tab, Fade } from '@mui/material';
+import { Box, Tabs, Tab, Fade, Tooltip } from '@mui/material';
 import Post from '../posts/post';
 import SingleCommentContainer from '../posts/comments/SingleCommentContainer';
 import { toast } from 'react-toastify';
@@ -71,6 +71,7 @@ const ProfilePage = () => {
     let [posts, setPosts] = useState([]);
     let [replies, setReplies] = useState([]);
     let [invitations, setInvitations] = useState([]);
+    let [involvedCommunities, setInvolvedCommunities] = useState([]);
     const [value, setValue] = useState(0);
     const [postsLength, setPostsLength] = useState([]);
     const [repliesLength, setRepliesLength] = useState([]);
@@ -100,6 +101,10 @@ const ProfilePage = () => {
         getUserInvitations(id ? id : auth.currentUser.uid)
             .then((snapshot) => {
                 setInvitations(snapshot);
+            })
+        getInvolvedCommunities(id ? id : auth.currentUser.uid)
+            .then((snapshot) => {
+                setInvolvedCommunities(snapshot);
             })
         getNewPosts()
             .then((snapshot) => {
@@ -182,6 +187,34 @@ const ProfilePage = () => {
 
             <div className='my-2 mb-4'>
                 <p className='m-0 text-light' style={{ fontSize: "14px", opacity: "0.8" }}>{profile.description}</p>
+
+                {
+                    auth.currentUser.uid === profile.uid &&
+                    <div style={{ margin: "10px 0" }}>
+                        <p className='m-0 text-light' style={{ fontSize: "16px" }}>Communities</p>
+                        <div className='my-1'>
+                            {
+                                involvedCommunities.map((community) => {
+                                    return (
+                                        <NavLink to={`/communities/${community.id}`} style={{ color: "#fff", background: "#161616", display: "inline-block", padding: "4px 8px", textDecoration: "none", fontSize: "12px", margin: "0 4px 4px 0" }}>
+                                            <img src={community.photoURL.src} alt="" style={{ width: "30px", height: "30px", borderRadius: "50%", pointerEvents: "none" }} />
+                                            <span>{community.communitiesName}</span>
+                                            <div style={{ color: "lightgray", background: "#000", display: "inline-block", padding: "2px 8px", borderRadius: "4px", marginLeft: "8px", cursor: "default", pointerEvents: "none" }}>
+                                                {
+                                                    community.role === 'member' ?
+                                                        <i className="fa-solid fa-user-large"></i>
+                                                        :
+                                                        <i className="fa-solid fa-user-gear"></i>
+                                                }
+                                                <small className='d-inline-block' style={{ marginLeft: "6px", fontWeight: "bold" }}>{community.role}</small>
+                                            </div>
+                                        </NavLink>
+                                    )
+                                })
+                            }
+                        </div>
+                    </div>
+                }
             </div>
             <hr style={{ color: "grey", margin: "20px 0" }} />
 

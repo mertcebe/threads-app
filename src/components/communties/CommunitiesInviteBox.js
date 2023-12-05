@@ -52,6 +52,7 @@ const CommunitiesInviteBox = () => {
                             .then((snapshot) => {
                                 openCommunitiesInviteFunc(dispatch, null, false)
                                 addDoc(collection(database, `users/${user.data().uid}/newMoves`), { type: 'invitation' });
+                                toast.dark('Invitation was sended!');
                             })
                     })
                 })

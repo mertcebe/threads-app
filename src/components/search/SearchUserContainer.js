@@ -23,15 +23,15 @@ export const MyViewButton = styled.button`
 const SearchUserContainer = ({ user }) => {
     let [role, setRole] = useState(user.role);
     let navigate = useNavigate();
-    const {id} = useParams();
-    
+    const { id } = useParams();
+
     const updateRole = (role) => {
         updateDoc(doc(database, `communities/${id}/members/${user.uid}`), {
             role: role
         })
-        .then(() => {
-            setRole(role);
-        })
+            .then(() => {
+                setRole(role);
+            })
     }
 
     return (
@@ -51,15 +51,19 @@ const SearchUserContainer = ({ user }) => {
                             {
                                 role === 'member' ?
                                     <IconButton onClick={() => {
-                                        updateRole('admin');
+                                        if (user.role === 'admin') {
+                                            updateRole('admin');
+                                        }
                                     }}>
-                                        <i className="fa-solid fa-user-large text-light" style={{fontSize: "14px"}}></i>
+                                        <i className="fa-solid fa-user-large text-light" style={{ fontSize: "14px" }}></i>
                                     </IconButton>
                                     :
                                     <IconButton onClick={() => {
-                                        updateRole('member');
+                                        if (user.role === 'admin') {
+                                            updateRole('member');
+                                        }
                                     }}>
-                                        <i className="fa-solid fa-user-gear text-light" style={{fontSize: "14px"}}></i>
+                                        <i className="fa-solid fa-user-gear text-light" style={{ fontSize: "14px" }}></i>
                                     </IconButton>
                             }
                         </div>

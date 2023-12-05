@@ -7,7 +7,7 @@ import defaultImg from '../../images/threadsLogo.png';
 import { setImagesToStorage } from '../../images/imageActions';
 import loadingGif from '../../images/loading.gif';
 import { auth } from '../../firebase/firebaseConfig';
-import { setCommunitiesToFirebase } from './CommunitiesActions';
+import { setAdminToFirebase, setCommunitiesToFirebase } from './CommunitiesActions';
 import { startCommentInCommentFunc } from '../../reducers/commentReducer/CommentsActions';
 
 const CommunitiesCreateBox = () => {
@@ -52,6 +52,7 @@ const CommunitiesCreateBox = () => {
         }
         await setCommunitiesToFirebase(communities)
             .then((snapshot) => {
+                setAdminToFirebase(user, snapshot);
                 setLoading(false);
                 setFile();
                 openCommunitiesMenuFunc(dispatch, false);

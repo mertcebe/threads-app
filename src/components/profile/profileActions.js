@@ -62,3 +62,19 @@ export const getUserInvitations = (uid) => {
             })
     })
 }
+
+export const getInvolvedCommunities = (uid) => {
+    return new Promise((resolve) => {
+        getDocs(query(collection(database, `users/${uid}/involvedCommunities`), orderBy('date', 'desc')))
+            .then((snapshot) => {
+                let communities = [];
+                snapshot.forEach((community) => {
+                    communities.push({
+                        ...community.data(),
+                        id: community.id
+                    });
+                })
+                resolve(communities);
+            })
+    })
+}

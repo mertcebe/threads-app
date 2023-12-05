@@ -17,6 +17,7 @@ import ProfilePage from '../components/profile'
 import EditPage from '../components/profile/EditPage'
 import SearchPage from '../components/search'
 import CommuntiesPage from '../components/communties'
+import CommunitiesEditPage from '../components/communties/CommunitiesEditPage'
 
 const AppRouter = () => {
   let { isAuthorized, loading } = useAuthorized();
@@ -51,6 +52,7 @@ const AppRouter = () => {
                 <Route path=':id' element={<ProfilePage />} />
               </Route>
               <Route path='/profile/edit' element={<EditPage />} />
+              <Route path='/communities/:id/edit' element={<CommunitiesEditPage />} />
             </Route>
 
             {/* Public Route */}

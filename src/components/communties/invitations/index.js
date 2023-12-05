@@ -10,15 +10,32 @@ import { toast } from 'react-toastify';
 
 const InvitationContainer = ({ invitation }) => {
     const acceptInviteFunc = () => {
+        let date = new Date().getTime();
         getDoc(doc(database, `users/${auth.currentUser.uid}`))
             .then((snapshot) => {
                 setDoc(doc(database, `communities/${invitation.community.id}/members/${auth.currentUser.uid}`), {
                     ...snapshot.data(),
                     role: invitation.role,
-                    dateAccepted: new Date().getTime()
+                    dateAccepted: date
                 })
                     .then(() => {
                         toast.dark('Invitation was accepted!');
+                        getDoc(doc(database, `communities/${invitation.community.id}`))
+                            .then((snapshotForCommunity) => {
+                                setDoc(doc(database, `users/${auth.currentUser.uid}/involvedCommunities/${invitation.community.id}`), {
+                                    ...snapshot.data(),
+                                    ...snapshotForCommunity.data(),
+                                    role: invitation.role,
+                                    date: date
+                                })
+                            })
+                            .then(() => {
+                                if (invitation.role === 'admin') {
+                                    setDoc(doc(database, `communities/${invitation.community.id}/admins/${auth.currentUser.uid}`), {
+                                        ...snapshot.data()
+                                    })
+                                }
+                            })
                         deleteInvitationFunc();
                     })
             })
