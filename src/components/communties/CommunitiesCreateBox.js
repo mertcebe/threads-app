@@ -37,7 +37,8 @@ const CommunitiesCreateBox = () => {
                         slugURL: slugURLText,
                         dateCreation: new Date().getTime(),
                         photoURL: snapshot[0],
-                        admin: user
+                        admin: user,
+                        bio: ''
                     }
                 })
         }
@@ -47,7 +48,8 @@ const CommunitiesCreateBox = () => {
                 slugURL: slugURLText,
                 dateCreation: new Date().getTime(),
                 photoURL: null,
-                admin: user
+                admin: user,
+                bio: ''
             }
         }
         await setCommunitiesToFirebase(communities)

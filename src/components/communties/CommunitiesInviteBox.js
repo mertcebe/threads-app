@@ -105,7 +105,7 @@ const CommunitiesInviteBox = () => {
                         <Button size="small" style={{ color: "rebeccapurple", fontSize: "10px", marginRight: "10px" }} onClick={() => {
                             openCommunitiesInviteFunc(dispatch, null, false);
                         }}>Cancel</Button>
-                        <Button size="small" variant='contained' style={{ fontSize: "8px", color: "#fff", lineHeight: "16px", background: "rebeccapurple" }} onClick={sendInvitationFunc}>{loading ? <img src={loadingGif} alt="" style={{ width: "16px", height: "16px" }} /> : 'Send invitations'}</Button>
+                        <Button size="small" variant='contained' style={{ fontSize: "8px", color: "#fff", lineHeight: "16px", background: "rebeccapurple" }} disabled={!role} onClick={sendInvitationFunc}>{loading ? <img src={loadingGif} alt="" style={{ width: "16px", height: "16px" }} /> : 'Send invitations'}</Button>
                     </div>
                 </div>
             </div>

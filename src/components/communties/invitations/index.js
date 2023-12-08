@@ -23,7 +23,6 @@ const InvitationContainer = ({ invitation }) => {
                         getDoc(doc(database, `communities/${invitation.community.id}`))
                             .then((snapshotForCommunity) => {
                                 setDoc(doc(database, `users/${auth.currentUser.uid}/involvedCommunities/${invitation.community.id}`), {
-                                    ...snapshot.data(),
                                     ...snapshotForCommunity.data(),
                                     role: invitation.role,
                                     date: date

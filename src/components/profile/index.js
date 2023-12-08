@@ -72,6 +72,7 @@ const ProfilePage = () => {
     let [replies, setReplies] = useState([]);
     let [invitations, setInvitations] = useState([]);
     let [involvedCommunities, setInvolvedCommunities] = useState([]);
+    let [involvedCommunitiesLength, setInvolvedCommunitiesLength] = useState(4);
     const [value, setValue] = useState(0);
     const [postsLength, setPostsLength] = useState([]);
     const [repliesLength, setRepliesLength] = useState([]);
@@ -167,7 +168,7 @@ const ProfilePage = () => {
                     <img src={profile.photoURL ? profile.photoURL : defaultProfileImg} alt="" style={{ width: "54px", height: "54px", borderRadius: "50%", marginRight: "5px" }} />
                     <div>
                         <h5 style={{ color: "#efefef", margin: "0" }}>{profile.displayName}</h5>
-                        <small className='m-0 text-secondary' style={{ fontSize: "11px" }}>@{profile.email}</small>
+                        <small className='m-0 text-secondary' style={{ fontSize: "11px" }}><Tooltip title={'email'}><span style={{color: "#efefef", cursor: "default"}}><i className="fa-solid fa-at"></i></span></Tooltip>{profile.email}</small>
                     </div>
                 </div>
                 {
@@ -194,7 +195,7 @@ const ProfilePage = () => {
                         <p className='m-0 text-light' style={{ fontSize: "16px" }}>Communities</p>
                         <div className='my-1'>
                             {
-                                involvedCommunities.map((community) => {
+                                involvedCommunities.slice(0, involvedCommunitiesLength).map((community) => {
                                     return (
                                         <NavLink to={`/communities/${community.id}`} style={{ color: "#fff", background: "#161616", display: "inline-block", padding: "4px 8px", textDecoration: "none", fontSize: "12px", margin: "0 4px 4px 0" }}>
                                             <img src={community.photoURL.src} alt="" style={{ width: "30px", height: "30px", borderRadius: "50%", pointerEvents: "none" }} />
@@ -211,6 +212,12 @@ const ProfilePage = () => {
                                         </NavLink>
                                     )
                                 })
+                            }
+                            {
+                                involvedCommunities.length > 4 && involvedCommunities.length > involvedCommunitiesLength&&
+                                <button style={{ background: "transparent", color: "#fff", border: "none", outline: "none", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }} onClick={() => {
+                                    setInvolvedCommunitiesLength(involvedCommunitiesLength + 4);
+                                }}><span className='d-inline-block' style={{ marginRight: "4px", fontSize: "12px" }}>See more</span><i className="fa-solid fa-angle-down" style={{ fontSize: "12px" }}></i></button>
                             }
                         </div>
                     </div>

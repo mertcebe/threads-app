@@ -15,7 +15,6 @@ export const setCommunitiesToFirebase = async (communities) => {
 
 export const setAdminToFirebase = async (user, community) => {
     await setDoc(doc(database, `users/${user.uid}/involvedCommunities/${community.id}`), {
-        ...user,
         ...community,
         role: 'admin',
         date: new Date().getTime()

@@ -14,12 +14,10 @@ const SingleCommunityContainer = ({ community }) => {
                     <small className='d-block' style={{ color: "grey", fontSize: "10px" }}>@{community.slugURL}</small>
                 </div>
             </div>
-            <div style={{height: "30px"}}>
+            <div style={{ margin: "10px 0" }}>
                 {
                     community.bio &&
-                    <div style={{ margin: "10px 0" }}>
-                        <small className='d-block' style={{ color: "grey" }}>{community.bio.slice(0, 70)}{community.bio.length >= 70 && '..'}</small>
-                    </div>
+                    <small className='d-block' style={{ color: "grey" }}>{community.bio.slice(0, 70)}{community.bio.length >= 70 && '..'}</small>
                 }
             </div>
             <MyViewButton onClick={() => {

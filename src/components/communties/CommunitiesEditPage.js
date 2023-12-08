@@ -48,7 +48,14 @@ const CommunitiesEditPage = () => {
     useEffect(() => {
         getCommunity(id)
             .then((snapshot) => {
-                setCommunity(snapshot);
+                if (snapshot.admin.uid !== auth.currentUser.uid) {
+                    navigate(-1);
+                }
+                else {
+                    setCommunity(snapshot);
+                    setName(snapshot.communitiesName);
+                    setBio(snapshot.bio);
+                }
             })
     }, []);
 
@@ -58,36 +65,32 @@ const CommunitiesEditPage = () => {
         e.preventDefault();
         setLoading(true);
         if (profileImg) {
-            setImagesToStorage([profileImg], auth.currentUser.uid)
+            setImagesToStorage([profileImg], community.id)
                 .then((snapshot) => {
-                    updateDoc(doc(database, `users/${auth.currentUser.uid}`), {
-                        displayName: name,
-                        description: bio,
-                        photoURL: snapshot[0].src
-                    });
-                    updateProfile(auth.currentUser, {
-                        displayName: name,
-                        photoURL: snapshot[0].src
+                    updateDoc(doc(database, `communities/${community.id}`), {
+                        communitiesName: name ? name : community.communitiesName,
+                        bio: bio ? bio : community.bio,
+                        photoURL: {
+                            name: snapshot[0].name,
+                            src: snapshot[0].src
+                        }
                     })
                         .then(() => {
-                            toast.dark('Editted profile');
+                            toast.dark('Editted community');
                             setLoading(false);
-                            navigate('/profile')
+                            navigate(`/communities/${community.id}`);
                         })
                 })
         }
         else {
-            updateDoc(doc(database, `users/${auth.currentUser.uid}`), {
-                displayName: name,
-                description: bio,
-            });
-            updateProfile(auth.currentUser, {
-                displayName: name
+            updateDoc(doc(database, `communities/${community.id}`), {
+                communitiesName: name ? name : community.communitiesName,
+                bio: bio ? bio : community.bio,
             })
                 .then(() => {
-                    toast.dark('Editted profile');
+                    toast.dark('Editted community');
                     setLoading(false);
-                    navigate('/profile')
+                    navigate(`/communities/${community.id}`);
                 })
         }
     }

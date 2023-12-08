@@ -22,10 +22,12 @@ export const MyViewButton = styled.button`
 
 const SearchUserContainer = ({ user }) => {
     let [role, setRole] = useState(user.role);
+    let [loading, setLoading] = useState(false);
     let navigate = useNavigate();
     const { id } = useParams();
 
     const updateRole = (role) => {
+        console.log(`communities/${id}/members/${user.uid}`)
         updateDoc(doc(database, `communities/${id}/members/${user.uid}`), {
             role: role
         })
@@ -45,25 +47,25 @@ const SearchUserContainer = ({ user }) => {
             </div>
             <div>
                 {
-                    user.role &&
+                    user.role === 'admin' &&
                     <Tooltip title={role === 'member' ? 'Member' : 'Admin'}>
                         <div style={{ color: "lightgray", background: "#000", display: "inline-block", padding: "2px 8px", borderRadius: "8px", margin: "0 10px", cursor: "default" }}>
                             {
                                 role === 'member' ?
                                     <IconButton onClick={() => {
-                                        if (user.role === 'admin') {
-                                            updateRole('admin');
-                                        }
-                                    }}>
-                                        <i className="fa-solid fa-user-large text-light" style={{ fontSize: "14px" }}></i>
+                                        setLoading(true);
+                                        setTimeout(() => {setLoading(false)}, 2000);
+                                        updateRole('admin');
+                                    }} disabled={loading}>
+                                        <i className="fa-solid fa-user-large text-light" style={{ fontSize: "14px", opacity: loading?'0.5':'1' }}></i>
                                     </IconButton>
                                     :
                                     <IconButton onClick={() => {
-                                        if (user.role === 'admin') {
-                                            updateRole('member');
-                                        }
-                                    }}>
-                                        <i className="fa-solid fa-user-gear text-light" style={{ fontSize: "14px" }}></i>
+                                        setLoading(true);
+                                        setTimeout(() => {setLoading(false)}, 2000);
+                                        updateRole('member');
+                                    }} disabled={loading}>
+                                        <i className="fa-solid fa-user-gear text-light" style={{ fontSize: "14px", opacity: loading?'0.5':'1' }}></i>
                                     </IconButton>
                             }
                         </div>
