@@ -9,6 +9,7 @@ import { MyViewButton } from '../search/SearchUserContainer'
 import DeleteIcon from '@mui/icons-material/DeleteOutline'
 import CallMissedOutgoingIcon from '@mui/icons-material/CallMissedOutgoing';
 import DoneOutlineIcon from '@mui/icons-material/DoneOutline';
+import { acceptApplicationFunc, deleteApplicationFunc } from './CommunitiesActions'
 
 const ApplicationUserContainer = ({ user }) => {
     let [role, setRole] = useState(user.role);
@@ -16,17 +17,12 @@ const ApplicationUserContainer = ({ user }) => {
     let navigate = useNavigate();
     const { id } = useParams();
 
-    const updateRole = (role) => {
-        updateDoc(doc(database, `communities/${id}/members/${user.sendedUser.uid}`), {
-            role: role
-        })
-            .then(() => {
-                setRole(role);
-            })
+    const deleteDocumentFunc = (id) => {
+        document.getElementById(id).style.opacity = 0.4;
     }
 
     return (
-        <div className='d-flex justify-content-between align-items-center w-100' style={{ margin: "10px 0" }}>
+        <div className='d-flex justify-content-between align-items-center w-100' id={user.uid} style={{ margin: "10px 0" }}>
             <div className='d-flex justify-content-between align-items-center'>
                 <img src={user.sendedUser.photoURL ? user.sendedUser.photoURL : profileImg} alt="" style={{ width: "50px", height: "50px", borderRadius: "50%", pointerEvents: "none" }} />
                 <div style={{ marginLeft: "10px" }}>
@@ -52,10 +48,20 @@ const ApplicationUserContainer = ({ user }) => {
                         <CallMissedOutgoingIcon sx={{ color: "lightblue", fontSize: "20px" }} />
                     </IconButton>
                 </Tooltip>
-                <IconButton style={{ marginRight: "10px" }} onClick={() => {}}>
+                <IconButton style={{ marginRight: "10px" }} onClick={() => {
+                    acceptApplicationFunc(id, user.sendedUser.uid)
+                        .then(() => {
+                            deleteDocumentFunc(user.sendedUser.uid);
+                        })
+                }}>
                     <DoneOutlineIcon sx={{ color: "lightgreen", fontSize: "20px" }} />
                 </IconButton>
-                <IconButton onClick={() => { }}>
+                <IconButton onClick={() => {
+                    deleteApplicationFunc(id, user.sendedUser.uid)
+                        .then(() => {
+                            deleteDocumentFunc(user.sendedUser.uid);
+                        })
+                }}>
                     <DeleteIcon sx={{ color: "red", fontSize: "20px" }} />
                 </IconButton>
             </div>

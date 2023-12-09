@@ -1,10 +1,11 @@
 import styled from '@emotion/styled'
-import React, { useState } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import React, { useEffect, useState } from 'react'
+import { useLocation, useNavigate, useParams } from 'react-router'
 import profileImg from '../../images/twitterProfileImg.png'
 import { IconButton, Tooltip } from '@mui/material'
-import { doc, updateDoc } from 'firebase/firestore'
-import database from '../../firebase/firebaseConfig'
+import { collection, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc } from 'firebase/firestore'
+import database, { auth } from '../../firebase/firebaseConfig'
+import { toast } from 'react-toastify'
 
 export const MyViewButton = styled.button`
     border: none;
@@ -22,18 +23,51 @@ export const MyViewButton = styled.button`
 
 const SearchUserContainer = ({ user }) => {
     let [role, setRole] = useState(user.role);
+    let [admins, setAdmins] = useState([]);
     let [loading, setLoading] = useState(false);
     let navigate = useNavigate();
+    let location = useLocation();
     const { id } = useParams();
 
     const updateRole = (role) => {
-        console.log(`communities/${id}/members/${user.uid}`)
         updateDoc(doc(database, `communities/${id}/members/${user.uid}`), {
             role: role
         })
             .then(() => {
+                // if (role === 'admin') {
+                //     setDoc(doc(database, `communities/${id}/admins/${user.uid}`), {
+                //         ...user,
+                //         role: 'admin'
+                //     })
+                //     deleteDoc(doc(database, `communities/${id}/members/${user.uid}`))
+                // }
+                // else if(role === 'member'){
+                //     setDoc(doc(database, `communities/${id}/members/${user.uid}`), {
+                //         ...user,
+                //         role: 'member'
+                //     })
+                //     deleteDoc(doc(database, `communities/${id}/admins/${user.uid}`))
+                // }
                 setRole(role);
             })
+    }
+
+    useEffect(() => {
+        getDocs(collection(database, `communities/${id}/admins`))
+            .then((snapshot) => {
+                let admins = [];
+                snapshot.forEach((user) => {
+                    admins.push(user.data().uid);
+                })
+                setAdmins(admins)
+            })
+    }, []);
+
+    const func = () => {
+        getDoc(doc(database, `communities/${id}/admins/${user.uid}`))
+        .then((snapshot) => {
+            setDoc(doc(database, `communities/${id}/members/${user.uid}`), snapshot.data());
+        })
     }
 
     return (
@@ -47,25 +81,29 @@ const SearchUserContainer = ({ user }) => {
             </div>
             <div>
                 {
-                    user.role === 'admin' &&
+                    location.pathname.includes('communities') &&
                     <Tooltip title={role === 'member' ? 'Member' : 'Admin'}>
                         <div style={{ color: "lightgray", background: "#000", display: "inline-block", padding: "2px 8px", borderRadius: "8px", margin: "0 10px", cursor: "default" }}>
                             {
                                 role === 'member' ?
                                     <IconButton onClick={() => {
-                                        setLoading(true);
-                                        setTimeout(() => {setLoading(false)}, 2000);
-                                        updateRole('admin');
+                                        if (admins.includes(auth.currentUser.uid) && auth.currentUser.uid !== user.uid) {
+                                            setLoading(true);
+                                            setTimeout(() => { setLoading(false) }, 2000);
+                                            updateRole('admin');
+                                        }
                                     }} disabled={loading}>
-                                        <i className="fa-solid fa-user-large text-light" style={{ fontSize: "14px", opacity: loading?'0.5':'1' }}></i>
+                                        <i className="fa-solid fa-user-large text-light" style={{ fontSize: "14px", opacity: loading ? '0.5' : '1' }}></i>
                                     </IconButton>
                                     :
                                     <IconButton onClick={() => {
-                                        setLoading(true);
-                                        setTimeout(() => {setLoading(false)}, 2000);
-                                        updateRole('member');
+                                        if (admins.includes(auth.currentUser.uid) && auth.currentUser.uid !== user.uid) {
+                                            setLoading(true);
+                                            setTimeout(() => { setLoading(false) }, 2000);
+                                            updateRole('member');
+                                        }
                                     }} disabled={loading}>
-                                        <i className="fa-solid fa-user-gear text-light" style={{ fontSize: "14px", opacity: loading?'0.5':'1' }}></i>
+                                        <i className="fa-solid fa-user-gear text-light" style={{ fontSize: "14px", opacity: loading ? '0.5' : '1' }}></i>
                                     </IconButton>
                             }
                         </div>

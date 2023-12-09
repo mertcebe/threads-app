@@ -76,7 +76,9 @@ const CommuntiesPage = () => {
     let [searchText, setSearchText] = useState('');
     let [community, setCommunity] = useState();
     let [communityMembers, setCommunityMembers] = useState();
+    let [communityAdmins, setCommunityAdmins] = useState();
     let [communityApplications, setCommunityApplications] = useState();
+    let [allMembers, setAllMembers] = useState([]);
     const [value, setValue] = useState(0);
     const { id } = useParams();
     // apply component
@@ -90,6 +92,7 @@ const CommuntiesPage = () => {
     };
 
     const navigate = useNavigate();
+
     const getAllCommunities = () => {
         return new Promise((resolve) => {
             getDocs(query(collection(database, `communities`), orderBy('communitiesName', 'asc')))
@@ -115,13 +118,28 @@ const CommuntiesPage = () => {
         })
     }
 
-    const getCommunityMembers = (id) => {
+    const getCommunityMembers = async (id) => {
         return new Promise((resolve) => {
             getDocs(query(collection(database, `communities/${id}/members`)), orderBy('dateAccepted', 'desc'))
                 .then((snapshot) => {
                     let members = [];
                     snapshot.forEach((member) => {
                         members.push(member.data());
+                        allMembers.push(member.data().uid);
+                    })
+                    resolve(members);
+                })
+        })
+    }
+
+    const getCommunityAdmins = async (id) => {
+        return new Promise((resolve) => {
+            getDocs(query(collection(database, `communities/${id}/admins`)))
+                .then((snapshot) => {
+                    let members = [];
+                    snapshot.forEach((member) => {
+                        members.push(member.data());
+                        allMembers.push(member.data().uid);
                     })
                     resolve(members);
                 })
@@ -154,6 +172,10 @@ const CommuntiesPage = () => {
             .then((snapshot) => {
                 setCommunityMembers(snapshot);
             })
+        getCommunityAdmins(id)
+            .then((snapshot) => {
+                setCommunityAdmins(snapshot);
+            })
         getCommunityApplications(id)
             .then((snapshot) => {
                 setCommunityApplications(snapshot);
@@ -162,12 +184,21 @@ const CommuntiesPage = () => {
     }, [id]);
 
     const handleChange = (event, newValue) => {
+        getCommunityMembers(id)
+            .then((snapshot) => {
+                setCommunityMembers(snapshot);
+            })
+        getCommunityAdmins(id)
+            .then((snapshot) => {
+                setCommunityAdmins(snapshot);
+            })
         setValue(newValue);
     };
 
     const sendApplicationFunc = (role) => {
         handleClose();
         const application = {
+            community: community,
             dateSended: new Date().getTime(),
             role: role,
             message: `I would like to be in your community called ${community.communitiesName}.`,
@@ -219,70 +250,75 @@ const CommuntiesPage = () => {
                                     <MyButton onClick={() => { navigate(`/communities/${id}/edit`) }}><i className="fa-regular fa-pen-to-square" style={{ fontSize: "14px", marginRight: "6px", color: "rebeccapurple" }}></i>Edit</MyButton>
                                     :
                                     <>
-                                        <Tooltip title="Apply for community">
-                                            <MyButton
-                                                onClick={handleClick}
-                                                size="small"
-                                                sx={{ ml: 2 }}
-                                                aria-controls={open ? 'account-menu' : undefined}
-                                                aria-haspopup="true"
-                                                aria-expanded={open ? 'true' : undefined}
-                                            >
-                                                Apply
-                                            </MyButton>
-                                        </Tooltip>
-                                        <Menu
-                                            anchorEl={anchorEl}
-                                            id="account-menu"
-                                            open={open}
-                                            onClose={handleClose}
-                                            onClick={handleClose}
-                                            PaperProps={{
-                                                elevation: 0,
-                                                sx: {
-                                                    overflow: 'visible',
-                                                    filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                                                    mt: 1.5,
-                                                    '& .MuiAvatar-root': {
-                                                        width: 32,
-                                                        height: 32,
-                                                        ml: -0.5,
-                                                        mr: 1,
-                                                    },
-                                                    '&:before': {
-                                                        content: '""',
-                                                        display: 'block',
-                                                        position: 'absolute',
-                                                        top: 0,
-                                                        right: 14,
-                                                        width: 10,
-                                                        height: 10,
-                                                        bgcolor: 'background.paper',
-                                                        transform: 'translateY(-50%) rotate(45deg)',
-                                                        zIndex: 0,
-                                                    },
-                                                },
-                                            }}
-                                            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                                            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                                        >
-                                            <MenuItem onClick={() => {
-                                                sendApplicationFunc('member');
-                                            }}>
-                                                <ListItemIcon>
-                                                    <PersonIcon fontSize="small" />
-                                                </ListItemIcon>
-                                                Apply for Member position
-                                            </MenuItem>
-                                            <MenuItem onClick={() => {
-                                                sendApplicationFunc('admin');
-                                            }}>
-                                                <ListItemIcon>
-                                                    <ManageAccountsIcon fontSize="small" />
-                                                </ListItemIcon>
-                                                Apply for Admin position
-                                            </MenuItem>
-                                        </Menu>
+                                        {
+                                            !allMembers.includes(auth.currentUser.uid) &&
+                                            <>
+                                                <Tooltip title="Apply for community">
+                                                    <MyButton
+                                                        onClick={handleClick}
+                                                        size="small"
+                                                        sx={{ ml: 2 }}
+                                                        aria-controls={open ? 'account-menu' : undefined}
+                                                        aria-haspopup="true"
+                                                        aria-expanded={open ? 'true' : undefined}
+                                                    >
+                                                        Apply
+                                                    </MyButton>
+                                                </Tooltip>
+                                                <Menu
+                                                    anchorEl={anchorEl}
+                                                    id="account-menu"
+                                                    open={open}
+                                                    onClose={handleClose}
+                                                    onClick={handleClose}
+                                                    PaperProps={{
+                                                        elevation: 0,
+                                                        sx: {
+                                                            overflow: 'visible',
+                                                            filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                                                            mt: 1.5,
+                                                            '& .MuiAvatar-root': {
+                                                                width: 32,
+                                                                height: 32,
+                                                                ml: -0.5,
+                                                                mr: 1,
+                                                            },
+                                                            '&:before': {
+                                                                content: '""',
+                                                                display: 'block',
+                                                                position: 'absolute',
+                                                                top: 0,
+                                                                right: 14,
+                                                                width: 10,
+                                                                height: 10,
+                                                                bgcolor: 'background.paper',
+                                                                transform: 'translateY(-50%) rotate(45deg)',
+                                                                zIndex: 0,
+                                                            },
+                                                        },
+                                                    }}
+                                                    transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                                                    anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                                                >
+                                                    <MenuItem onClick={() => {
+                                                        sendApplicationFunc('member');
+                                                    }}>
+                                                        <ListItemIcon>
+                                                            <PersonIcon fontSize="small" />
+                                                        </ListItemIcon>
+                                                        Apply for Member position
+                                                    </MenuItem>
+                                                    <MenuItem onClick={() => {
+                                                        sendApplicationFunc('admin');
+                                                    }}>
+                                                        <ListItemIcon>
+                                                            <ManageAccountsIcon fontSize="small" />
+                                                        </ListItemIcon>
+                                                        Apply for Admin position
+                                                    </MenuItem>
+                                                </Menu>
+                                            </>
+                                        }
                                     </>
                             }
                         </>
@@ -327,6 +363,13 @@ const CommuntiesPage = () => {
                     {
                         value === 1 &&
                         <>
+                            {
+                                communityAdmins.map((member) => {
+                                    return (
+                                        <SearchUserContainer user={member} />
+                                    )
+                                })
+                            }
                             {
                                 communityMembers.map((member) => {
                                     return (
