@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
-import { IconButton, TextareaAutosize } from '@mui/material'
-import React, { useState } from 'react'
+import { IconButton, Menu, MenuItem, Switch, TextareaAutosize, alpha } from '@mui/material'
+import React, { useEffect, useState } from 'react'
 import DoDisturbOnIcon from '@mui/icons-material/DoDisturbOn';
 import database, { auth } from '../../firebase/firebaseConfig';
 import { setImagesToStorage } from '../../images/imageActions';
@@ -8,6 +8,10 @@ import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import loadingGif from '../../images/gifThreads.gif'
 import plusImage from '../../images/plusImage.png'
+import { getInvolvedCommunities } from '../profile/profileActions';
+import { pink } from '@mui/material/colors';
+import AssistantIcon from '@mui/icons-material/Assistant';
+import BeenhereIcon from '@mui/icons-material/Beenhere';
 
 export const MyButton = styled.button`
   background: #b075e6;
@@ -24,10 +28,56 @@ export const MyButton = styled.button`
   margin-top: 10px;
 `;
 
+const PinkSwitch = styled(Switch)(({ theme }) => ({
+  '& .MuiSwitch-switchBase.Mui-checked': {
+    color: pink[600],
+    '&:hover': {
+      backgroundColor: alpha(pink[600], theme.palette.action.hoverOpacity),
+    },
+  },
+  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+    backgroundColor: pink[600],
+  },
+}));
+
+const label = { inputProps: { 'aria-label': 'Color switch demo' } };
+
 const CreatePage = () => {
   let [text, setText] = useState();
   let [files, setFiles] = useState([]);
   let [loading, setLoading] = useState(false);
+  let [communities, setCommunities] = useState([]);
+  let [allCommunitiesName, setAllCommunitiesName] = useState([]);
+  const [checked, setChecked] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [checkedCommunity, setCheckedCommunity] = useState();
+
+  // toggle switch component
+  const handleChange = (event) => {
+    setChecked(event.target.checked);
+  };
+
+  // select component
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  useEffect(() => {
+    getInvolvedCommunities(auth.currentUser.uid)
+      .then((snapshot) => {
+        setCommunities(snapshot);
+        let allCommunitiesNames = [];
+        snapshot.forEach((community) => {
+          allCommunitiesNames.push(community.communitiesName);
+        })
+        setAllCommunitiesName(allCommunitiesNames);
+      })
+  }, []);
+
   const postFunc = () => {
     setLoading(true);
     let user = {
@@ -43,7 +93,7 @@ const CreatePage = () => {
     if (files.length !== 0) {
       setImagesToStorage(files, auth.currentUser.uid)
         .then((snapshot) => {
-          addDoc(collection(database, `users/${auth.currentUser.uid}/newMoves`), {type: 'post'});
+          addDoc(collection(database, `users/${auth.currentUser.uid}/newMoves`), { type: 'post' });
           addDoc(collection(database, `users/${auth.currentUser.uid}/posts`), {
             ...post,
             images: snapshot,
@@ -62,7 +112,7 @@ const CreatePage = () => {
         })
     }
     else {
-      addDoc(collection(database, `users/${auth.currentUser.uid}/newMoves`), {type: 'post'});
+      addDoc(collection(database, `users/${auth.currentUser.uid}/newMoves`), { type: 'post' });
       addDoc(collection(database, `users/${auth.currentUser.uid}/posts`), {
         ...post
       })
@@ -79,6 +129,13 @@ const CreatePage = () => {
     }
     setText('');
     setFiles([]);
+  }
+
+  if (!communities) {
+    return (
+      <div style={{ width: "calc(100% - 534.28px)", boxSizing: "border-box", padding: "40px 30px" }}>
+      </div>
+    )
   }
   return (
     <div style={{ width: "calc(100% - 534.28px)", boxSizing: "border-box", padding: "40px 30px" }}>
@@ -146,6 +203,62 @@ const CreatePage = () => {
               </button>
             </div>
           }
+        </div>
+      }
+      {
+        communities &&
+        <div>
+          <IconButton
+            aria-label="more"
+            id="long-button"
+            aria-controls={open ? 'long-menu' : undefined}
+            aria-expanded={open ? 'true' : undefined}
+            aria-haspopup="true"
+            onClick={handleClick}
+          >
+            {
+              checkedCommunity ? <BeenhereIcon sx={{ color: "rebeccapurple", fontSize: "14px" }} /> : <AssistantIcon sx={{ color: "#fff", fontSize: "14px" }} />
+            }
+          </IconButton>
+          <Menu
+            id="long-menu"
+            MenuListProps={{
+              'aria-labelledby': 'long-button',
+            }}
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            PaperProps={{
+              style: {
+                width: '20ch',
+              },
+            }}
+          >
+            <MenuItem key={'none'} onClick={() => {
+              setCheckedCommunity();
+              setChecked(false);
+              handleClose();
+            }}>
+              None
+            </MenuItem>
+            {allCommunitiesName.map((option) => (
+              <MenuItem key={option} onClick={() => {
+                setCheckedCommunity(option);
+                handleClose();
+              }}>
+                {option}
+              </MenuItem>
+            ))}
+          </Menu>
+          <Switch
+            checked={checked}
+            onChange={handleChange}
+            inputProps={{ 'aria-label': 'controlled' }}
+            {...label}
+            color="secondary"
+            size='small'
+            disabled={checkedCommunity?false:true}
+          />
         </div>
       }
       <MyButton onClick={postFunc} disabled={text || files.length !== 0 ? false : true} style={{ opacity: text || files.length !== 0 ? '1' : '0.7' }}>Post Thread</MyButton>

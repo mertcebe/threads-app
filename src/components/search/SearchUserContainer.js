@@ -34,20 +34,20 @@ const SearchUserContainer = ({ user }) => {
             role: role
         })
             .then(() => {
-                // if (role === 'admin') {
-                //     setDoc(doc(database, `communities/${id}/admins/${user.uid}`), {
-                //         ...user,
-                //         role: 'admin'
-                //     })
-                //     deleteDoc(doc(database, `communities/${id}/members/${user.uid}`))
-                // }
-                // else if(role === 'member'){
-                //     setDoc(doc(database, `communities/${id}/members/${user.uid}`), {
-                //         ...user,
-                //         role: 'member'
-                //     })
-                //     deleteDoc(doc(database, `communities/${id}/admins/${user.uid}`))
-                // }
+                if (role === 'admin') {
+                    setDoc(doc(database, `communities/${id}/admins/${user.uid}`), {
+                        ...user,
+                        role: 'admin'
+                    })
+                    setDoc(doc(database, `communities/${id}/members/${user.uid}`), {})
+                }
+                else{
+                    setDoc(doc(database, `communities/${id}/members/${user.uid}`), {
+                        ...user,
+                        role: 'member'
+                    })
+                    setDoc(doc(database, `communities/${id}/admins/${user.uid}`), {})
+                }
                 setRole(role);
             })
     }
