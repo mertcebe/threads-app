@@ -1,10 +1,10 @@
 import styled from '@emotion/styled';
-import { IconButton, Menu, MenuItem, Switch, TextareaAutosize, alpha } from '@mui/material'
+import { IconButton, Menu, MenuItem, Switch, TextareaAutosize, Tooltip, alpha } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import DoDisturbOnIcon from '@mui/icons-material/DoDisturbOn';
 import database, { auth } from '../../firebase/firebaseConfig';
 import { setImagesToStorage } from '../../images/imageActions';
-import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, query, setDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import loadingGif from '../../images/gifThreads.gif'
 import plusImage from '../../images/plusImage.png'
@@ -46,7 +46,7 @@ const CreatePage = () => {
   let [text, setText] = useState();
   let [files, setFiles] = useState([]);
   let [loading, setLoading] = useState(false);
-  let [communities, setCommunities] = useState([]);
+  let [communities, setCommunities] = useState();
   let [allCommunitiesName, setAllCommunitiesName] = useState([]);
   const [checked, setChecked] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -78,7 +78,31 @@ const CreatePage = () => {
       })
   }, []);
 
-  const postFunc = () => {
+  const setThreadsForCommunity = (postId, communityId, threadsData) => {
+    setDoc(doc(database, `communities/${communityId}/threads/${postId}`), {
+      ...threadsData
+    })
+      .then(() => {
+        setDoc(doc(database, `users/${auth.currentUser.uid}/threadsForCommunities/${postId}`), {
+          ...threadsData,
+          communityId: communityId
+        });
+      })
+  }
+
+  const postFunc = async () => {
+    const community = checked ? communities.find((community) => community.communitiesName === checkedCommunity) : null;
+    let allMembers = [];
+    if (checked) {
+      const snapshotForAdmins = await getDocs(query(collection(database, `communities/${community.id}/admins`)))
+      const snapshotForMembers = await getDocs(query(collection(database, `communities/${community.id}/members`)))
+      snapshotForAdmins.forEach((user) => {
+        allMembers.push(user.data().uid);
+      })
+      snapshotForMembers.forEach((user) => {
+        allMembers.push(user.data().uid);
+      })
+    }
     setLoading(true);
     let user = {
       displayName: auth.currentUser.displayName,
@@ -97,16 +121,27 @@ const CreatePage = () => {
           addDoc(collection(database, `users/${auth.currentUser.uid}/posts`), {
             ...post,
             images: snapshot,
+            forWhichCommunity: community ? {
+              ...community,
+              allMembers: allMembers
+            } : 'all'
           })
             .then((snapshotForPost) => {
               setDoc(doc(database, `allPosts/${snapshotForPost.id}`), {
                 ...post,
                 images: snapshot,
-                owner: user
+                owner: user,
+                forWhichCommunity: community ? {
+                  ...community,
+                  allMembers: allMembers
+                } : 'all'
               })
                 .then(() => {
                   toast.dark('Posted a thread!');
                   setLoading(false);
+                  if (checked) {
+                    setThreadsForCommunity(snapshotForPost.id, community.id, { ...post, images: snapshot, owner: user })
+                  }
                 })
             })
         })
@@ -114,17 +149,28 @@ const CreatePage = () => {
     else {
       addDoc(collection(database, `users/${auth.currentUser.uid}/newMoves`), { type: 'post' });
       addDoc(collection(database, `users/${auth.currentUser.uid}/posts`), {
-        ...post
+        ...post,
+        forWhichCommunity: community ? {
+          ...community,
+          allMembers: allMembers
+        } : 'all'
       })
         .then((snapshotForPost) => {
           setDoc(doc(database, `allPosts/${snapshotForPost.id}`), {
             ...post,
-            owner: user
+            owner: user,
+            forWhichCommunity: community ? {
+              ...community,
+              allMembers: allMembers
+            } : 'all'
           })
-        })
-        .then(() => {
-          toast.dark('Posted a thread!');
-          setLoading(false);
+            .then(() => {
+              toast.dark('Posted a thread!');
+              setLoading(false);
+              if (checked) {
+                setThreadsForCommunity(snapshotForPost.id, community.id, { ...post, owner: user })
+              }
+            })
         })
     }
     setText('');
@@ -149,9 +195,67 @@ const CreatePage = () => {
       }
       <h4 style={{ color: "#fff" }}><b>Create Thread</b></h4>
       <p style={{ color: "grey", marginTop: "30px" }}>Content</p>
-      <textarea value={text} style={{ width: "100%", height: "300px", resize: "none", outline: "none", border: "none", background: "#222", color: "#fff", padding: "10px" }} placeholder='Text something...' onChange={(e) => {
-        setText(e.target.value);
-      }}></textarea>
+      <div style={{ position: "relative" }}>
+        <textarea value={text} style={{ width: "100%", height: "300px", resize: "none", outline: "none", border: "none", background: "#222", color: "#fff", padding: "10px" }} placeholder='Text something...' onChange={(e) => {
+          setText(e.target.value);
+        }}></textarea>
+        {
+          communities.length !== 0 &&
+          <div style={{ position: "absolute", bottom: "10px", right: "10px" }}>
+            <IconButton
+              aria-label="more"
+              id="long-button"
+              aria-controls={open ? 'long-menu' : undefined}
+              aria-expanded={open ? 'true' : undefined}
+              aria-haspopup="true"
+              onClick={handleClick}
+            >
+              {
+                checkedCommunity ? <Tooltip title={checkedCommunity}><BeenhereIcon sx={{ color: "#613a57", fontSize: "14px" }} /></Tooltip> : <AssistantIcon sx={{ color: "#fff", fontSize: "14px" }} />
+              }
+            </IconButton>
+            <Menu
+              id="long-menu"
+              MenuListProps={{
+                'aria-labelledby': 'long-button',
+              }}
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              PaperProps={{
+                style: {
+                  width: '20ch',
+                },
+              }}
+            >
+              <MenuItem key={'none'} onClick={() => {
+                setCheckedCommunity();
+                setChecked(false);
+                handleClose();
+              }}>
+                None
+              </MenuItem>
+              {allCommunitiesName.map((option) => (
+                <MenuItem key={option} onClick={() => {
+                  setCheckedCommunity(option);
+                  handleClose();
+                }}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Menu>
+            <Switch
+              checked={checked}
+              onChange={handleChange}
+              inputProps={{ 'aria-label': 'controlled' }}
+              {...label}
+              color="secondary"
+              size='small'
+              disabled={checkedCommunity ? false : true}
+            />
+          </div>
+        }
+      </div>
       <input type="file" id='fileInputForPost' multiple defaultValue={files} style={{ display: "none" }} onChange={(e) => {
         let files = [];
         for (let i = 0; i < e.target.files.length; i++) {
@@ -205,62 +309,7 @@ const CreatePage = () => {
           }
         </div>
       }
-      {
-        communities &&
-        <div>
-          <IconButton
-            aria-label="more"
-            id="long-button"
-            aria-controls={open ? 'long-menu' : undefined}
-            aria-expanded={open ? 'true' : undefined}
-            aria-haspopup="true"
-            onClick={handleClick}
-          >
-            {
-              checkedCommunity ? <BeenhereIcon sx={{ color: "rebeccapurple", fontSize: "14px" }} /> : <AssistantIcon sx={{ color: "#fff", fontSize: "14px" }} />
-            }
-          </IconButton>
-          <Menu
-            id="long-menu"
-            MenuListProps={{
-              'aria-labelledby': 'long-button',
-            }}
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            PaperProps={{
-              style: {
-                width: '20ch',
-              },
-            }}
-          >
-            <MenuItem key={'none'} onClick={() => {
-              setCheckedCommunity();
-              setChecked(false);
-              handleClose();
-            }}>
-              None
-            </MenuItem>
-            {allCommunitiesName.map((option) => (
-              <MenuItem key={option} onClick={() => {
-                setCheckedCommunity(option);
-                handleClose();
-              }}>
-                {option}
-              </MenuItem>
-            ))}
-          </Menu>
-          <Switch
-            checked={checked}
-            onChange={handleChange}
-            inputProps={{ 'aria-label': 'controlled' }}
-            {...label}
-            color="secondary"
-            size='small'
-            disabled={checkedCommunity?false:true}
-          />
-        </div>
-      }
+
       <MyButton onClick={postFunc} disabled={text || files.length !== 0 ? false : true} style={{ opacity: text || files.length !== 0 ? '1' : '0.7' }}>Post Thread</MyButton>
     </div>
   )

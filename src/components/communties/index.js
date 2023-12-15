@@ -16,6 +16,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import { toast } from 'react-toastify';
 import ApplicationUserContainer from './ApplicationUserContainer';
+import Post from '../posts/post';
 
 const MyButton = styled.button`
     display: flex;
@@ -79,6 +80,7 @@ const CommuntiesPage = () => {
     let [communityAdmins, setCommunityAdmins] = useState();
     let [communityApplications, setCommunityApplications] = useState();
     let [allMembers, setAllMembers] = useState([]);
+    let [communityThreads, setCommunityThreads] = useState([]);
     const [value, setValue] = useState(0);
     const { id } = useParams();
     // apply component
@@ -159,6 +161,19 @@ const CommuntiesPage = () => {
         })
     }
 
+    const getCommunityThreads = (id) => {
+        return new Promise((resolve) => {
+            getDocs(query(collection(database, `communities/${id}/threads`)), orderBy('dateAdded', 'desc'))
+                .then((snapshot) => {
+                    let posts = [];
+                    snapshot.forEach((post) => {
+                        posts.push(post.data());
+                    })
+                    resolve(posts);
+                })
+        })
+    }
+
     useEffect(() => {
         getAllCommunities()
             .then((snapshot) => {
@@ -180,6 +195,10 @@ const CommuntiesPage = () => {
             .then((snapshot) => {
                 setCommunityApplications(snapshot);
                 console.log(snapshot)
+            })
+        getCommunityThreads(id)
+            .then((snapshot) => {
+                setCommunityThreads(snapshot);
             })
     }, [id]);
 
@@ -351,13 +370,13 @@ const CommuntiesPage = () => {
                     {
                         value === 0 &&
                         <>
-                            {/* {
-                                posts.map((post) => {
+                            {
+                                communityThreads.map((post) => {
                                     return (
                                         <Post post={post} />
                                     )
                                 })
-                            } */}
+                            }
                         </>
                     }
                     {

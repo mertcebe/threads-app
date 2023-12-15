@@ -36,7 +36,7 @@ const Post = ({ post }) => {
   }
 
   const deletePostFunc = () => {
-    
+
   }
 
   return (
@@ -109,9 +109,19 @@ const Post = ({ post }) => {
             }
           </>
         }
-        <div className='text-light' style={{ opacity: "0.2", position: "relative", left: "-30px" }}>
-          <span>-</span>
-          <Moment utc style={{ fontSize: "11px" }}>{post.dateAdded}</Moment>
+        <div className='text-light' style={{ position: "relative", left: "-30px", display: "flex", alignItems: "center" }}>
+          <span style={{ opacity: "0.2" }}>-</span>
+          <Moment utc style={{ opacity: "0.2", fontSize: "11px" }}>{post.dateAdded}</Moment>
+          {
+            post.forWhichCommunity?.id &&
+            <span style={{display: "flex", alignItems: "center"}}>
+              <span style={{ opacity: "0.2", margin: "0 5px" }}>-</span>
+              <NavLink to={`/communities/${post.forWhichCommunity.id}`} style={{ textDecoration: "none", color: "#fff", opacity: "0.7", fontSize: "14px", display: "flex", alignItems: "center" }}>
+                <span>{post.forWhichCommunity.communitiesName}</span>
+                <img src={post.forWhichCommunity.photoURL.src} alt="" style={{ width: "20px", height: "20px", borderRadius: "50%", marginLeft: "4px", pointerEvents: "none" }} />
+              </NavLink>
+            </span>
+          }
         </div>
       </div>
     </div>

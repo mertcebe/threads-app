@@ -3,14 +3,17 @@ import database, { auth } from "../../../firebase/firebaseConfig";
 
 export const getAllPosts = () => {
     return new Promise((resolve) => {
+        let posts = [];
         getDocs(query(collection(database, `allPosts`), orderBy('dateAdded', 'desc')))
             .then((snapshot) => {
-                let posts = [];
-                snapshot.forEach((item) => {
-                    posts.push({
-                        ...item.data(),
-                        id: item.id
-                    });
+                snapshot.forEach(async (item) => {
+                    console.log(item.data().forWhichCommunity?.allMembers?.includes(`${auth.currentUser.uid}`))
+                    if (item.data().forWhichCommunity?.allMembers?.includes(`${auth.currentUser.uid}`) || item.data().forWhichCommunity === 'all') {
+                        posts.push({
+                            ...item.data(),
+                            id: item.id
+                        });
+                    }
                 })
                 resolve(posts);
             })

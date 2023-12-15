@@ -190,7 +190,7 @@ const ProfilePage = () => {
                 <p className='m-0 text-light' style={{ fontSize: "14px", opacity: "0.8" }}>{profile.description}</p>
 
                 {
-                    auth.currentUser.uid === profile.uid &&
+                    auth.currentUser.uid === profile.uid && involvedCommunities.length !== 0 &&
                     <div style={{ margin: "10px 0" }}>
                         <p className='m-0 text-light' style={{ fontSize: "16px" }}>Communities</p>
                         <div className='my-1'>
