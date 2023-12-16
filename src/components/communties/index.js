@@ -17,6 +17,7 @@ import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import { toast } from 'react-toastify';
 import ApplicationUserContainer from './ApplicationUserContainer';
 import Post from '../posts/post';
+import errorImage from '../../images/errorPageIcon.webp';
 
 const MyButton = styled.button`
     display: flex;
@@ -94,6 +95,7 @@ const CommuntiesPage = () => {
     };
 
     const navigate = useNavigate();
+
 
     const getAllCommunities = () => {
         return new Promise((resolve) => {
@@ -371,11 +373,23 @@ const CommuntiesPage = () => {
                         value === 0 &&
                         <>
                             {
-                                communityThreads.map((post) => {
-                                    return (
-                                        <Post post={post} />
-                                    )
-                                })
+                                allMembers.includes(auth.currentUser.uid) ?
+                                    <>
+                                        {
+                                            communityThreads.map((post) => {
+                                                return (
+                                                    <Post post={post} />
+                                                )
+                                            })
+                                        }
+                                    </>
+                                    :
+                                    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "calc(100vh - 330px)" }}>
+                                        <div>
+                                            <img src={errorImage} alt="" style={{pointerEvents: "none"}} />
+                                            <p className='text-light' style={{fontWeight: "bold"}}>Only members can see the threads!</p>
+                                        </div>
+                                    </div>
                             }
                         </>
                     }
