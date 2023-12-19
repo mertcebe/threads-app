@@ -5,7 +5,6 @@ import profileImg from '../../images/twitterProfileImg.png'
 import { IconButton, Tooltip } from '@mui/material'
 import { collection, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc } from 'firebase/firestore'
 import database, { auth } from '../../firebase/firebaseConfig'
-import { toast } from 'react-toastify'
 
 export const MyViewButton = styled.button`
     border: none;
@@ -30,26 +29,32 @@ const SearchUserContainer = ({ user }) => {
     const { id } = useParams();
 
     const updateRole = (role) => {
-        updateDoc(doc(database, `communities/${id}/members/${user.uid}`), {
-            role: role
-        })
-            .then(() => {
-                if (role === 'admin') {
-                    setDoc(doc(database, `communities/${id}/admins/${user.uid}`), {
-                        ...user,
-                        role: 'admin'
-                    })
-                    setDoc(doc(database, `communities/${id}/members/${user.uid}`), {})
-                }
-                else{
-                    setDoc(doc(database, `communities/${id}/members/${user.uid}`), {
-                        ...user,
-                        role: 'member'
-                    })
-                    setDoc(doc(database, `communities/${id}/admins/${user.uid}`), {})
-                }
-                setRole(role);
+        if (role === 'admin') {
+            setDoc(doc(database, `communities/${id}/admins/${user.uid}`), {
+                ...user,
+                role: 'admin'
             })
+            deleteDoc(doc(database, `communities/${id}/members/${user.uid}`))
+                .then(() => {
+                    updateDoc(doc(database, `communities/${id}/admins/${user.uid}`), {
+                        role: role
+                    })
+                })
+        }
+        else {
+            setDoc(doc(database, `communities/${id}/members/${user.uid}`), {
+                ...user,
+                role: 'member'
+            })
+            deleteDoc(doc(database, `communities/${id}/admins/${user.uid}`))
+                .then(() => {
+                    updateDoc(doc(database, `communities/${id}/members/${user.uid}`), {
+                        role: role
+                    })
+                })
+        }
+        setRole(role);
+
     }
 
     useEffect(() => {
@@ -62,13 +67,6 @@ const SearchUserContainer = ({ user }) => {
                 setAdmins(admins)
             })
     }, []);
-
-    const func = () => {
-        getDoc(doc(database, `communities/${id}/admins/${user.uid}`))
-        .then((snapshot) => {
-            setDoc(doc(database, `communities/${id}/members/${user.uid}`), snapshot.data());
-        })
-    }
 
     return (
         <div className='d-flex justify-content-between align-items-center w-100' style={{ margin: "10px 0" }}>

@@ -1,15 +1,15 @@
 import styled from '@emotion/styled'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import profileImg from '../../images/twitterProfileImg.png'
 import { IconButton, Tooltip } from '@mui/material'
-import { doc, updateDoc } from 'firebase/firestore'
-import database from '../../firebase/firebaseConfig'
+import { collection, doc, getDocs, orderBy, query, updateDoc } from 'firebase/firestore'
+import database, { auth } from '../../firebase/firebaseConfig'
 import { MyViewButton } from '../search/SearchUserContainer'
 import DeleteIcon from '@mui/icons-material/DeleteOutline'
 import CallMissedOutgoingIcon from '@mui/icons-material/CallMissedOutgoing';
 import DoneOutlineIcon from '@mui/icons-material/DoneOutline';
-import { acceptApplicationFunc, deleteApplicationFunc } from './CommunitiesActions'
+import { acceptApplicationFunc, deleteApplicationFunc, getCommunity } from './CommunitiesActions'
 
 const ApplicationUserContainer = ({ user }) => {
     let [role, setRole] = useState(user.role);
@@ -19,10 +19,11 @@ const ApplicationUserContainer = ({ user }) => {
 
     const deleteDocumentFunc = (id) => {
         document.getElementById(id).style.opacity = 0.4;
+        document.getElementById(id).style.pointerEvents = 'none';
     }
 
     return (
-        <div className='d-flex justify-content-between align-items-center w-100' id={user.uid} style={{ margin: "10px 0" }}>
+        <div className='d-flex justify-content-between align-items-center w-100' id={user.sendedUser.uid} style={{ margin: "10px 0" }}>
             <div className='d-flex justify-content-between align-items-center'>
                 <img src={user.sendedUser.photoURL ? user.sendedUser.photoURL : profileImg} alt="" style={{ width: "50px", height: "50px", borderRadius: "50%", pointerEvents: "none" }} />
                 <div style={{ marginLeft: "10px" }}>

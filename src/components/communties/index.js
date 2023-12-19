@@ -82,6 +82,7 @@ const CommuntiesPage = () => {
     let [communityApplications, setCommunityApplications] = useState();
     let [allMembers, setAllMembers] = useState([]);
     let [communityThreads, setCommunityThreads] = useState([]);
+    let [allCommunityAdmins, setAllCommunityAdmins] = useState([]);
     const [value, setValue] = useState(0);
     const { id } = useParams();
     // apply component
@@ -141,10 +142,13 @@ const CommuntiesPage = () => {
             getDocs(query(collection(database, `communities/${id}/admins`)))
                 .then((snapshot) => {
                     let members = [];
+                    let communityAdmins = [];
                     snapshot.forEach((member) => {
                         members.push(member.data());
                         allMembers.push(member.data().uid);
+                        communityAdmins.push(member.data().uid);
                     })
+                    setAllCommunityAdmins(communityAdmins);
                     resolve(members);
                 })
         })
@@ -202,7 +206,7 @@ const CommuntiesPage = () => {
             .then((snapshot) => {
                 setCommunityThreads(snapshot);
             })
-    }, [id]);
+    }, [id, value]);
 
     const handleChange = (event, newValue) => {
         getCommunityMembers(id)
@@ -247,13 +251,13 @@ const CommuntiesPage = () => {
     if (id) {
         if (!community) {
             return (
-                <div style={{ width: "calc(100% - 534.28px)", padding: "40px 30px" }}>
+                <div className='responsiveContanier' style={{ width: "calc(100% - 534.28px)", padding: "40px 30px" }}>
                     loading...
                 </div>
             )
         }
         return (
-            <div style={{ width: "calc(100% - 534.28px)", padding: "40px 30px" }}>
+            <div className='responsiveContanier' style={{ width: "calc(100% - 534.28px)", padding: "40px 30px" }}>
                 {/* profile */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div className='d-flex align-items-center'>
@@ -386,8 +390,8 @@ const CommuntiesPage = () => {
                                     :
                                     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "calc(100vh - 330px)" }}>
                                         <div>
-                                            <img src={errorImage} alt="" style={{pointerEvents: "none"}} />
-                                            <p className='text-light' style={{fontWeight: "bold"}}>Only members can see the threads!</p>
+                                            <img src={errorImage} alt="" style={{ pointerEvents: "none" }} />
+                                            <p className='text-light' style={{ fontWeight: "bold" }}>Only members can see the threads!</p>
                                         </div>
                                     </div>
                             }
@@ -416,11 +420,20 @@ const CommuntiesPage = () => {
                         value === 2 &&
                         <>
                             {
-                                communityApplications.map((member) => {
-                                    return (
-                                        <ApplicationUserContainer user={member} />
-                                    )
-                                })
+                                allCommunityAdmins.includes(auth.currentUser.uid) ?
+                                    <>
+                                        {
+                                            communityApplications.map((member) => {
+                                                return (
+                                                    <ApplicationUserContainer user={member} />
+                                                )
+                                            })
+                                        }
+                                    </>
+                                    :
+                                    <div>
+                                        info
+                                    </div>
                             }
                         </>
                     }
@@ -431,13 +444,13 @@ const CommuntiesPage = () => {
     else {
         if (!communities) {
             return (
-                <div style={{ width: "calc(100% - 534.28px)", padding: "40px 30px" }}>
+                <div className='responsiveContanier' style={{ width: "calc(100% - 534.28px)", padding: "40px 30px" }}>
                     <Skeleton />
                 </div>
             )
         }
         return (
-            <div style={{ width: "calc(100% - 534.28px)", padding: "40px 30px" }}>
+            <div className='responsiveContanier' style={{ width: "calc(100% - 534.28px)", padding: "40px 30px" }}>
                 <h4 style={{ color: "#fff" }}><b>Communities</b></h4>
 
                 <MyInput type='search' style={{ padding: "10px", borderRadius: "10px" }} onChange={(e) => {
@@ -450,7 +463,7 @@ const CommuntiesPage = () => {
                         communities.map((community) => {
                             if (community.communitiesName.toLowerCase().includes(searchText.toLowerCase()) || community.slugURL.toLowerCase().includes(searchText.toLowerCase())) {
                                 return (
-                                    <SingleCommunityContainer community={community} />
+                                    <SingleCommunityContainer community={community} allCommunityAdmins={allCommunityAdmins} />
                                 )
                             }
                         })

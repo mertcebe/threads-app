@@ -95,13 +95,13 @@ const EditPage = () => {
 
     if (!profile) {
         return (
-            <div style={{ width: "calc(100% - 534.28px)", padding: "40px 30px" }}>
+            <div className='responsiveContanier' style={{ width: "calc(100% - 534.28px)", padding: "40px 30px" }}>
                 loading...
             </div>
         )
     }
     return (
-        <div style={{ width: "calc(100% - 534.28px)", padding: "40px 30px" }}>
+        <div className='responsiveContanier' style={{ width: "calc(100% - 534.28px)", padding: "40px 30px" }}>
             <h4 style={{ color: "#fff" }}><b>Edit Profile</b></h4>
             <small className='text-secondary' style={{ fontSize: "12px" }}><b>Make any changes</b></small>
             {

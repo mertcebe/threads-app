@@ -4,3 +4,16 @@
     top: 50px;
     width: 340px;
 }
+
+.rightBarContainer{
+    height: calc(100vh - 50px);
+    position: sticky;
+    top: 50px;
+    width: 340px;
+}
+
+@media (max-width: 960px) {
+    .rightBarContainer {
+        display: none !important;
+    }
+}

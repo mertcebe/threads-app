@@ -6,6 +6,7 @@ a.active{
     height: calc(100vh - 50px);
     position: sticky;
     top: 50px;
+    width: 204.28px;
 }
 
 .navLink {
@@ -22,4 +23,13 @@ a.active{
 .navLink:hover {
     background-color: #b075e6 !important;
     color: #fff !important;
+}
+
+@media (max-width: 700px){
+    .leftBarContainer{
+        width: 82px;
+    }
+    .navLink b{
+        display: none;
+    }
 }

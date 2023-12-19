@@ -30,13 +30,13 @@ const SearchPage = () => {
 
     if (!users) {
         return (
-            <div style={{ width: "calc(100% - 534.28px)", padding: "40px 30px" }}>
+            <div className='responsiveContanier' style={{ width: "calc(100% - 534.28px)", padding: "40px 30px" }}>
                 loading...
             </div>
         )
     }
     return (
-        <div style={{ width: "calc(100% - 534.28px)", padding: "40px 30px" }}>
+        <div className='responsiveContanier' style={{ width: "calc(100% - 534.28px)", padding: "40px 30px" }}>
             <h4 style={{ color: "#fff" }}><b>Search</b></h4>
 
             <MyInput type='search' style={{ padding: "10px", borderRadius: "10px" }} onChange={(e) => {

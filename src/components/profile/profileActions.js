@@ -18,11 +18,20 @@ export const getUserPosts = (uid) => {
                     .then((snapshot) => {
                         let posts = [];
                         snapshot.forEach((post) => {
-                            posts.push({
-                                ...post.data(),
-                                id: post.id,
-                                owner: snapshotForUser
-                            });
+                            if (post.data().forWhichCommunity === 'all') {
+                                posts.push({
+                                    ...post.data(),
+                                    id: post.id,
+                                    owner: snapshotForUser
+                                });
+                            }
+                            else if (post.data().forWhichCommunity.allMembers.includes(auth.currentUser.uid)) {
+                                posts.push({
+                                    ...post.data(),
+                                    id: post.id,
+                                    owner: snapshotForUser
+                                });
+                            }
                         })
                         resolve(posts);
                     })

@@ -179,12 +179,12 @@ const CreatePage = () => {
 
   if (!communities) {
     return (
-      <div style={{ width: "calc(100% - 534.28px)", boxSizing: "border-box", padding: "40px 30px" }}>
+      <div className='responsiveContanier' style={{ width: "calc(100% - 534.28px)", boxSizing: "border-box", padding: "40px 30px" }}>
       </div>
     )
   }
   return (
-    <div style={{ width: "calc(100% - 534.28px)", boxSizing: "border-box", padding: "40px 30px" }}>
+    <div className='responsiveContanier' style={{ width: "calc(100% - 534.28px)", boxSizing: "border-box", padding: "40px 30px" }}>
       {
         loading &&
         <div style={{ position: "absolute", top: "0", left: "0", backdropFilter: "brightness(0.6)", width: "100%", height: "100vh", zIndex: "100" }}>
