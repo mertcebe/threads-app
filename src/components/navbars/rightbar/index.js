@@ -78,7 +78,7 @@ const RightBar = () => {
           {
             users.map((user) => {
               return (
-                <SearchUserContainer user={user} />
+                <SearchUserContainer user={user} type={'search'} />
               )
             })
           }

@@ -8,13 +8,13 @@ import { toast } from 'react-toastify';
 import { auth } from '../../../firebase/firebaseConfig';
 import { useNavigate } from 'react-router';
 import { NavLink, useSearchParams } from 'react-router-dom';
-import { getCommentsFrom } from '../postActions';
+import { getCommentsFrom, setLike } from '../postActions';
 import Moment from 'react-moment'
 import DeleteIcon from '@mui/icons-material/Delete';
 
 const Post = ({ post }) => {
   let [posts, setPosts] = useState();
-  let [isLike, setIsLike] = useState();
+  let [isLike, setIsLike] = useState(post.isLike?post.isLike:false);
   let [comments, setComments] = useState();
   const searchParams = useSearchParams()[0].get('id');
 
@@ -61,6 +61,7 @@ const Post = ({ post }) => {
             <input type="checkbox" id={`chForLike${post.id}`} checked={isLike} style={{ display: "none" }} />
             <IconButton style={{ cursor: "pointer" }} onClick={(e) => {
               setIsLike(!isLike);
+              setLike(post.id, !isLike);
             }}>
               <i className="fa-regular fa-heart" style={{ color: isLike ? '#ff3a3a' : '#4a4a4a', fontSize: "18px" }}></i>
             </IconButton>

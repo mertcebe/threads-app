@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, setDoc, where } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, setDoc, updateDoc, where } from "firebase/firestore";
 import database, { auth } from "../../../firebase/firebaseConfig";
 
 export const getAllPosts = () => {
@@ -157,4 +157,24 @@ export const getNewInvitations = async () => {
                 resolve(moves);
             })
     })
+}
+
+export const setLike = async (postId, value) => {
+    await updateDoc(doc(database, `allPosts/${postId}`), {
+        isLike: value
+    });
+    await getDoc(doc(database, `allPosts/${postId}`))
+        .then((snapshot) => {
+            updateDoc(doc(database, `users/${snapshot.data().owner.uid}/posts/${postId}`), {
+                isLike: value
+            });
+            if (snapshot.data().forWhichCommunity !== 'all') {
+                updateDoc(doc(database, `communities/${snapshot.data().forWhichCommunity.id}/threads/${postId}`), {
+                    isLike: value
+                });
+                updateDoc(doc(database, `users/${snapshot.data().owner.uid}/threadsForCommunities/${postId}`), {
+                    isLike: value
+                });
+            }
+        })
 }

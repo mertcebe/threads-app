@@ -11,7 +11,7 @@ import style from './style.module.css'
 const LeftBar = ({type}) => {
   return (
     <div className={style.leftBarContainer} style={{display: "inline-block", padding: "14px 10px", background: "#161616"}}>
-        <ul id='leftbarUl' style={{listStyle: "none", padding: "0"}}>
+        <ul id='leftbarUl' className={style.leftBarUl} style={{listStyle: "none", padding: "0"}}>
             <li><NavLink className={style.navLink} to={'/'}><HomeIcon sx={{marginRight: "5px"}} /><b className='leftBarLiText'>Home</b></NavLink></li>
             <li><NavLink className={style.navLink} to={'/search'}><SearchIcon sx={{marginRight: "5px"}} /><b className='leftBarLiText'>Search</b></NavLink></li>
             <li><NavLink className={style.navLink} to={'/activity'}><FavoriteBorderIcon sx={{marginRight: "5px"}} /><b className='leftBarLiText'>Activity</b></NavLink></li>

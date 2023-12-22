@@ -20,7 +20,7 @@ export const MyViewButton = styled.button`
     }
 `
 
-const SearchUserContainer = ({ user }) => {
+const SearchUserContainer = ({ user, type }) => {
     let [role, setRole] = useState(user.role);
     let [admins, setAdmins] = useState([]);
     let [loading, setLoading] = useState(false);
@@ -79,33 +79,38 @@ const SearchUserContainer = ({ user }) => {
             </div>
             <div>
                 {
-                    location.pathname.includes('communities') &&
-                    <Tooltip title={role === 'member' ? 'Member' : 'Admin'}>
-                        <div style={{ color: "lightgray", background: "#000", display: "inline-block", padding: "2px 8px", borderRadius: "8px", margin: "0 10px", cursor: "default" }}>
-                            {
-                                role === 'member' ?
-                                    <IconButton onClick={() => {
-                                        if (admins.includes(auth.currentUser.uid) && auth.currentUser.uid !== user.uid) {
-                                            setLoading(true);
-                                            setTimeout(() => { setLoading(false) }, 2000);
-                                            updateRole('admin');
-                                        }
-                                    }} disabled={loading}>
-                                        <i className="fa-solid fa-user-large text-light" style={{ fontSize: "14px", opacity: loading ? '0.5' : '1' }}></i>
-                                    </IconButton>
-                                    :
-                                    <IconButton onClick={() => {
-                                        if (admins.includes(auth.currentUser.uid) && auth.currentUser.uid !== user.uid) {
-                                            setLoading(true);
-                                            setTimeout(() => { setLoading(false) }, 2000);
-                                            updateRole('member');
-                                        }
-                                    }} disabled={loading}>
-                                        <i className="fa-solid fa-user-gear text-light" style={{ fontSize: "14px", opacity: loading ? '0.5' : '1' }}></i>
-                                    </IconButton>
-                            }
-                        </div>
-                    </Tooltip>
+                    type !== 'search' &&
+                    <>
+                        {
+                            location.pathname.includes('communities') &&
+                            <Tooltip title={role === 'member' ? 'Member' : 'Admin'}>
+                                <div style={{ color: "lightgray", background: "#000", display: "inline-block", padding: "2px 8px", borderRadius: "8px", margin: "0 10px", cursor: "default" }}>
+                                    {
+                                        role === 'member' ?
+                                            <IconButton onClick={() => {
+                                                if (admins.includes(auth.currentUser.uid) && auth.currentUser.uid !== user.uid) {
+                                                    setLoading(true);
+                                                    setTimeout(() => { setLoading(false) }, 2000);
+                                                    updateRole('admin');
+                                                }
+                                            }} disabled={loading}>
+                                                <i className="fa-solid fa-user-large text-light" style={{ fontSize: "14px", opacity: loading ? '0.5' : '1' }}></i>
+                                            </IconButton>
+                                            :
+                                            <IconButton onClick={() => {
+                                                if (admins.includes(auth.currentUser.uid) && auth.currentUser.uid !== user.uid) {
+                                                    setLoading(true);
+                                                    setTimeout(() => { setLoading(false) }, 2000);
+                                                    updateRole('member');
+                                                }
+                                            }} disabled={loading}>
+                                                <i className="fa-solid fa-user-gear text-light" style={{ fontSize: "14px", opacity: loading ? '0.5' : '1' }}></i>
+                                            </IconButton>
+                                    }
+                                </div>
+                            </Tooltip>
+                        }
+                    </>
                 }
                 <MyViewButton onClick={() => {
                     navigate(`/profile/${user.uid}`)
